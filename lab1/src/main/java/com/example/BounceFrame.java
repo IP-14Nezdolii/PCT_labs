@@ -16,8 +16,8 @@ import java.awt.Color;
 public class BounceFrame extends JFrame {
     private Controller controller;
 
-    public static final int WIDTH = 1000;
-    public static final int HEIGHT = 600;
+    public static final int WIDTH = 400;
+    public static final int HEIGHT = 400;
 
     public BounceFrame() {
         this.setSize(WIDTH, HEIGHT);

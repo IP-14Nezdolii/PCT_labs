@@ -84,17 +84,30 @@ public class Model {
             balls.add(ball2);
 
             Thread thread1 = new Thread(runBall(ball1));
-            thread1.setPriority(ball1.getPriority());
             thread1.start();
 
-            try {
-                thread1.join();
-            } catch (Exception e) {
+            Thread thread2 = new Thread(() -> {
+                try {
+                    try {
+                        thread1.join();
+                    } catch (Exception e) {
+        
+                    }
 
-            }
-            
-            Thread thread2 = new Thread(runBall(ball2));
-            thread2.setPriority(ball2.getPriority());
+                    while (ball2.isFallen() == false) {   
+    
+                        if (isBallInPocket(ball2))
+                            ball2.setFallen(true);
+    
+                        ball2.move();
+    
+                        System.out.println("Thread name = " + Thread.currentThread().getName());
+                        Thread.sleep(4);
+                    }
+                } catch (InterruptedException ex) {
+    
+                }
+            });
             thread2.start();
        });
 

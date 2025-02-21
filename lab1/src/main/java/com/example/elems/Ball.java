@@ -69,11 +69,11 @@ public class Ball extends CanvasElem {
         getCanvas().repaint();
     }
 
-    public boolean isFallen() {
+    public synchronized boolean isFallen() {
         return isFallen;
     }
 
-    public void setFallen(boolean onDelete) {
+    public synchronized void setFallen(boolean onDelete) {
         this.isFallen = onDelete;
     }
 
