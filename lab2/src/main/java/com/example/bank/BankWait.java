@@ -12,7 +12,7 @@ public class BankWait extends Bank {
     }
 
     @Override
-    public void transfer(int from, int to, int amount) {
+    synchronized public void transfer(int from, int to, int amount) {
         try {
             while (accounts[from] < amount)
                 wait();

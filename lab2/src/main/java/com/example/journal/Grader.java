@@ -6,7 +6,7 @@ import java.util.concurrent.locks.LockSupport;
 public class Grader implements Runnable {
     private static long WAITING = 100_000;
 
-    private static volatile int CURRENT_WEEK = 0;
+    private static int CURRENT_WEEK = 0;
 
     private static int N_WEEKS = 10;
     private static int N_MARKS = 6;

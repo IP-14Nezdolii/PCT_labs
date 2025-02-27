@@ -22,7 +22,7 @@ public class Bank {
             test();
     }
 
-    synchronized public void test() {
+    public void test() {
         int sum = 0;
 
         for (int i = 0; i < accounts.length; i++)

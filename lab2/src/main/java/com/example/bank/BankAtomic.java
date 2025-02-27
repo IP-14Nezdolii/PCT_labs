@@ -16,20 +16,21 @@ public class BankAtomic extends Bank {
 
     @Override
     public void transfer(int from, int to, int amount) {
-        while (accounts[from].get() < amount) 
-            LockSupport.parkNanos(800_000);
-    
-        if (accounts[from].get() < amount) 
-            throw new IllegalStateException("Not enough money");
-
-        accounts[to].addAndGet(-amount);
-        accounts[from].addAndGet(amount);
-
-        synchronized (this) {
-            ntransacts++;
-            if (ntransacts % NTEST == 0)
-                test();
+        while (true) {
+            int currentBalance = accounts[from].get();
+            
+            if (currentBalance < amount) {
+                LockSupport.parkNanos(500_000);
+            }
+            else if (accounts[from].compareAndSet(currentBalance, currentBalance - amount)) {
+                accounts[to].addAndGet(amount);
+                break; 
+            }
         }
+
+        ntransacts++;
+        if (ntransacts % NTEST == 0)
+            test();
     }
 
     @Override

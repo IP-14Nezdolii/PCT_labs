@@ -22,6 +22,7 @@ public class BankLock extends Bank {
     
             accounts[from] -= amount;
             accounts[to] += amount;
+            
             ntransacts++;
             if (ntransacts % NTEST == 0)
                 test();
