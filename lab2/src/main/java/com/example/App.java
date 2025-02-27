@@ -26,11 +26,11 @@ public class App {
     }
 
     static void runTask1(int nAccounts, int initialBalance) {
-        //bankRun(new Bank(nAccounts, initialBalance), initialBalance);
+        bankRun(new Bank(nAccounts, initialBalance), initialBalance);
         bankRun(new BankSync(nAccounts, initialBalance), initialBalance);
-        //bankRun(new BankAtomic(nAccounts, initialBalance), initialBalance);
-        //bankRun(new BankWait(nAccounts, initialBalance), initialBalance);
-        //bankRun(new BankLock(nAccounts, initialBalance), initialBalance);
+        bankRun(new BankAtomic(nAccounts, initialBalance), initialBalance);
+        bankRun(new BankWait(nAccounts, initialBalance), initialBalance);
+        bankRun(new BankLock(nAccounts, initialBalance), initialBalance);
     }
 
     static void bankRun(Bank b, int initialBalance) {
