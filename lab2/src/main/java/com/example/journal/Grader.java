@@ -45,10 +45,8 @@ public class Grader implements Runnable {
             addMarks();
             this.LAST_WEEK++;
 
-            synchronized (outputLock) {
-                System.out.println(Thread.currentThread().getName() +
+            System.out.println(Thread.currentThread().getName() +
                 " Week: " + LAST_WEEK);
-            }
         }
     }
 

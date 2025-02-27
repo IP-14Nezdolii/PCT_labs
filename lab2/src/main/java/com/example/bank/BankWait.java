@@ -1,14 +1,9 @@
 package com.example.bank;
 
 public class BankWait extends Bank {
-    private final Object[] lock;
 
     public BankWait(int n, int initialBalance) {
         super(n, initialBalance);
-
-        lock = new Object[n];
-        for (int i = 0; i < lock.length; i++) 
-            lock[i] = new Object();
     }
 
     @Override

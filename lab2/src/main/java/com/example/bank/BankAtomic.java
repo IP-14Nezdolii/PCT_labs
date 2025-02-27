@@ -1,10 +1,12 @@
 package com.example.bank;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.LockSupport;
 
 public class BankAtomic extends Bank {
     private final AtomicInteger[] accounts;
+    private AtomicBoolean outputLock = new AtomicBoolean();
 
     public BankAtomic(int n, int initialBalance) {
         super(n, initialBalance);
@@ -17,8 +19,11 @@ public class BankAtomic extends Bank {
     @Override
     public void transfer(int from, int to, int amount) {
         while (true) {
+            while (outputLock.get()) 
+                LockSupport.parkNanos(500_000);
+
             int currentBalance = accounts[from].get();
-            
+
             if (currentBalance < amount) {
                 LockSupport.parkNanos(500_000);
             }
@@ -29,8 +34,12 @@ public class BankAtomic extends Bank {
         }
 
         ntransacts++;
-        if (ntransacts % NTEST == 0)
+        if (ntransacts % NTEST == 0) {
+            outputLock.set(true);
             test();
+            outputLock.set(false);
+        }
+            
     }
 
     @Override

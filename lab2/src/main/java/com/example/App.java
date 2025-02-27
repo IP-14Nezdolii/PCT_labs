@@ -6,6 +6,7 @@ import java.util.Random;
 import com.example.bank.Bank;
 import com.example.bank.BankAtomic;
 import com.example.bank.BankLock;
+import com.example.bank.BankSync;
 import com.example.bank.BankWait;
 import com.example.bank.TransferRunnable;
 import com.example.journal.Grader;
@@ -25,10 +26,11 @@ public class App {
     }
 
     static void runTask1(int nAccounts, int initialBalance) {
-        bankRun(new Bank(nAccounts, initialBalance), initialBalance);
-        bankRun(new BankAtomic(nAccounts, initialBalance), initialBalance);
-        bankRun(new BankWait(nAccounts, initialBalance), initialBalance);
-        bankRun(new BankLock(nAccounts, initialBalance), initialBalance);
+        //bankRun(new Bank(nAccounts, initialBalance), initialBalance);
+        bankRun(new BankSync(nAccounts, initialBalance), initialBalance);
+        //bankRun(new BankAtomic(nAccounts, initialBalance), initialBalance);
+        //bankRun(new BankWait(nAccounts, initialBalance), initialBalance);
+        //bankRun(new BankLock(nAccounts, initialBalance), initialBalance);
     }
 
     static void bankRun(Bank b, int initialBalance) {
