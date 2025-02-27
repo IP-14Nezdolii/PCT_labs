@@ -29,7 +29,6 @@ public class BankLock extends Bank {
             сondition.signal();
         } catch (InterruptedException e) {
             e.printStackTrace();
-            Thread.currentThread().interrupt();
         } finally {
             lock.unlock();
         }

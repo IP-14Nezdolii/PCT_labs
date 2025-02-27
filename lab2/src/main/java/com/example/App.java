@@ -18,8 +18,8 @@ import com.example.symbols.Symbols;
 public class App {
 
     public static void main(String[] args) {
-        //runTask1(8, 10_000);
-        runTask2(100);
+        runTask1(8, 10_000);
+        //runTask2(100);
         //runTask3(0);
         //runTask4();
     }
