@@ -39,6 +39,7 @@ public class TaskService {
             semaphore.release(maxThreads + waitingQueueSize);
         } catch (InterruptedException e) {
             e.printStackTrace();
+            Thread.currentThread().interrupt();
         }
     }
 
