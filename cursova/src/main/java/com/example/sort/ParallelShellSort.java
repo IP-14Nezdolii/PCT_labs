@@ -22,10 +22,10 @@ public class ParallelShellSort extends ShellSort {
         List<T> list, 
         Comparator<T> comp,
         int maxThreads,
-        int minThreadSublistLen 
+        int threadSublistParam 
     ) {
         if (maxThreads > 1) 
-            (new Sorter<>(list, comp, maxThreads, minThreadSublistLen)).sort();
+            (new Sorter<>(list, comp, maxThreads, threadSublistParam)).sort();
         else
             sort(list, comp);
     }
@@ -37,16 +37,16 @@ public class ParallelShellSort extends ShellSort {
         private final Comparator<T> comp;
 
         private int elemGap;
-        private int minThreadSublistLen;
+        private int threadSublistParam;
 
         public Sorter(
             List<T> list, 
             Comparator<T> comp,
             int maxThreads,
-            int minThreadGapLen 
+            int threadSublistParam 
         ) {
             service = new TaskService(maxThreads, maxThreads/2);
-            this.minThreadSublistLen = minThreadGapLen;
+            this.threadSublistParam = threadSublistParam;
 
             this.list = list;
             this.comp = comp;
@@ -57,7 +57,7 @@ public class ParallelShellSort extends ShellSort {
         public void sort() {
             for (elemGap = getStartGap(list.size()); elemGap > 0; elemGap /= 2) {
 
-                if (list.size() / elemGap <= minThreadSublistLen || elemGap == 1) {
+                if (list.size() / elemGap <= threadSublistParam || elemGap == 1) {
                     for (int g = elemGap; g < elemGap*2 && g < list.size(); g++)
                         gapSort(g);
                 } else {
