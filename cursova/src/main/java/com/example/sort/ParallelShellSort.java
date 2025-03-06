@@ -13,7 +13,19 @@ public class ParallelShellSort extends ShellSort {
         int maxThreads
     ) {
         if (maxThreads > 1) 
-            (new Sorter<>(list, comp, maxThreads)).sort();
+            (new Sorter<>(list, comp, maxThreads, 20)).sort();
+        else
+            sort(list, comp);
+    }
+
+    public static <T> void sort(
+        List<T> list, 
+        Comparator<T> comp,
+        int maxThreads,
+        int minThreadSublistLen 
+    ) {
+        if (maxThreads > 1) 
+            (new Sorter<>(list, comp, maxThreads, minThreadSublistLen)).sort();
         else
             sort(list, comp);
     }
@@ -24,29 +36,32 @@ public class ParallelShellSort extends ShellSort {
         private final List<T> list;
         private final Comparator<T> comp;
 
-        private int gap;
+        private int elemGap;
+        private int minThreadSublistLen;
 
         public Sorter(
             List<T> list, 
             Comparator<T> comp,
-            int maxThreads
+            int maxThreads,
+            int minThreadGapLen 
         ) {
             service = new TaskService(maxThreads, maxThreads/2);
+            this.minThreadSublistLen = minThreadGapLen;
 
             this.list = list;
             this.comp = comp;
 
-            gap = getStartGap(list.size());
+            elemGap = getStartGap(list.size());
         }
 
         public void sort() {
-            for (gap = getStartGap(list.size()); gap > 0; gap /= 2) {
+            for (elemGap = getStartGap(list.size()); elemGap > 0; elemGap /= 2) {
 
-                if (list.size() / gap < 1000 || gap == 1) {
-                    for (int g = gap; g < 2*gap && g < list.size(); g++)
+                if (list.size() / elemGap <= minThreadSublistLen || elemGap == 1) {
+                    for (int g = elemGap; g < elemGap*2 && g < list.size(); g++)
                         gapSort(g);
                 } else {
-                    for (int g = gap; g < 2*gap && g < list.size(); g++) 
+                    for (int g = elemGap; g < elemGap*2 && g < list.size(); g++) 
                         service.addTask(createTask(g));
                     service.waitTasks();
                 }
@@ -55,14 +70,14 @@ public class ParallelShellSort extends ShellSort {
         }
 
         private void gapSort(int g) {
-            for (int i = g; i < list.size(); i+=gap) {
+            for (int i = g; i < list.size(); i+=elemGap) {
                 T temp = list.get(i);
                 int j = i;
-                while (j >= gap && 
-                    comp.compare(list.get(j - gap), temp) > 0
+                while (j >= elemGap && 
+                    comp.compare(list.get(j - elemGap), temp) > 0
                 ){
-                    list.set(j, list.get(j - gap));
-                    j -= gap;
+                    list.set(j, list.get(j - elemGap));
+                    j -= elemGap;
                 }
                 list.set(j, temp);
             }

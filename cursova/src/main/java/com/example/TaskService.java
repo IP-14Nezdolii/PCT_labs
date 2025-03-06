@@ -17,7 +17,7 @@ public class TaskService {
         this.waitingQueueSize = waitingQueueSize;
 
         executor = Executors.newFixedThreadPool(maxThreads);
-        semaphore = new Semaphore(maxThreads + waitingQueueSize, true);
+        semaphore = new Semaphore(maxThreads + waitingQueueSize);
     }
 
     public void addTask(Runnable task) {
@@ -57,5 +57,9 @@ public class TaskService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public int maxThreads() {
+        return maxThreads;
     }
 }

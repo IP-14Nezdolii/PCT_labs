@@ -32,7 +32,6 @@ public class ShellSort {
         for (int i = 0; gap <= len; i++) 
             gap = (1 << i) - 1;
 
-        gap /= 2;
-        return gap;
+        return gap / 2;
     }
 }
