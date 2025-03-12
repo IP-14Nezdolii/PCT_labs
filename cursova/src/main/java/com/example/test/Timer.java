@@ -1,24 +1,24 @@
-package com.example.bench;
+package com.example.test;
 
 public class Timer {
-    private long start = 0;
+    private double start = 0;
     private long end = 0;
 
-    public long start() {
+    public double start() {
         this.start = System.currentTimeMillis();
         return this.start;
     }
 
-    public long end() {
+    public double end() {
         this.end = System.currentTimeMillis();
         return this.end;
     }
 
-    public float resultTimeMillis() {
+    public double resultTimeMillis() {
         return end - start;
     }
 
-    public float resultTime() {
-        return ((float)(end - start))/1_000;
+    public double resultTime() {
+        return (end - start)/1_000.0;
     }
 }

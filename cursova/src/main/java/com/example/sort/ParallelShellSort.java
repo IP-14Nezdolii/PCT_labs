@@ -9,23 +9,23 @@ public class ParallelShellSort extends ShellSort {
 
     public static <T> void sort(
         List<T> list, 
-        Comparator<T> comp,
+        Comparator<T> cmp,
         int maxThreads
     ) {
         if (maxThreads > 1) 
-            (new Sorter<>(list, comp, maxThreads, 20)).sort();
+            (new Sorter<>(list, cmp, maxThreads, 20)).sort();
         else
-            sort(list, comp);
+            sort(list, cmp);
     }
 
     public static <T> void sort(
         List<T> list, 
         Comparator<T> cmp,
         int maxThreads,
-        int threadSublistParam 
+        int sublistParam 
     ) {
         if (maxThreads > 1) 
-            (new Sorter<>(list, cmp, maxThreads, threadSublistParam)).sort();
+            (new Sorter<>(list, cmp, maxThreads, sublistParam)).sort();
         else
             sort(list, cmp);
     }
@@ -34,22 +34,22 @@ public class ParallelShellSort extends ShellSort {
         private final TaskService service;
 
         private final List<T> list;
-        private final Comparator<T> comp;
+        private final Comparator<T> cmp;
 
         private int elemGap;
-        private int threadSublistParam;
+        private int sublistParam;
 
         public Sorter(
             List<T> list, 
-            Comparator<T> comp,
+            Comparator<T> cmp,
             int maxThreads,
-            int threadSublistParam 
+            int sublistParam 
         ) {
             service = new TaskService(maxThreads, maxThreads/2);
-            this.threadSublistParam = threadSublistParam;
+            this.sublistParam = sublistParam;
 
             this.list = list;
-            this.comp = comp;
+            this.cmp = cmp;
 
             elemGap = getStartGap(list.size());
         }
@@ -57,7 +57,7 @@ public class ParallelShellSort extends ShellSort {
         public void sort() {
             for (elemGap = getStartGap(list.size()); elemGap > 0; elemGap /= 2) {
 
-                if (list.size() / elemGap <= threadSublistParam || elemGap == 1) {
+                if (list.size() / elemGap <= sublistParam || elemGap == 1) {
                     for (int g = elemGap; g < elemGap*2 && g < list.size(); g++)
                         gapSort(g);
                 } else {
@@ -74,7 +74,7 @@ public class ParallelShellSort extends ShellSort {
                 T temp = list.get(i);
                 int j = i;
                 while (j >= elemGap && 
-                        comp.compare(list.get(j - elemGap), temp) > 0
+                        cmp.compare(list.get(j - elemGap), temp) > 0
                 ){
                     list.set(j, list.get(j - elemGap));
                     j -= elemGap;

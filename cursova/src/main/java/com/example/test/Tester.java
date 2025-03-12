@@ -1,4 +1,4 @@
-package com.example.bench;
+package com.example.test;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -10,41 +10,23 @@ public class Tester {
     
     public record TestResult (
         int size,
-        float time, 
+        double time, 
         int threadNumb,
+        int sublistParam,
         String sortedClassName
+    ) {}
+
+    public record Params(
+        int from, 
+        int to, 
+        int num
     ) {}
 
     public static <T> TestResult run(
         List<T> list, 
         Comparator<T> cmp, 
-        int threadNumb
-    ) {
-        List<T> expected = 
-            new ArrayList<>(list)
-                .stream().sorted(cmp).toList();
-
-        var timer = new Timer();
-        timer.start();
-        ParallelShellSort.sort(list, cmp, threadNumb);
-        timer.end();
-
-        if (!expected.equals(list)) 
-            throw new IllegalStateException("List is not sorted");
-
-        return new TestResult(
-            list.size(), 
-            timer.resultTime(), 
-            threadNumb, 
-            list.get(0).getClass().getName()
-        );
-    }
-
-    public static <T> TestResult run(
-        List<T> list, 
-        Comparator<T> cmp, 
         int threadNumb, 
-        int threadSublistParam
+        int sublistParam
     ) {
         List<T> expected = 
             new ArrayList<>(list)
@@ -62,6 +44,7 @@ public class Tester {
             list.size(), 
             timer.resultTime(), 
             threadNumb, 
+            sublistParam,
             list.get(0).getClass().getName()
         );
     }
