@@ -59,8 +59,4 @@ public class TaskService {
             e.printStackTrace();
         }
     }
-
-    public int maxThreads() {
-        return maxThreads;
-    }
 }

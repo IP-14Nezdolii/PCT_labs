@@ -1,6 +1,7 @@
 package com.example.bench;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import com.example.sort.ParallelShellSort;
@@ -10,37 +11,50 @@ public class Tester {
     public record TestResult (
         int size,
         float time, 
-        int threadNumb
+        int threadNumb,
+        String sortedClassName
     ) {}
 
-    public static TestResult run(List<Integer> list, int threadNumb) {
-        List<Integer> expected = new ArrayList<>(list);
-        expected.sort(Integer::compare);
+    public static <T> TestResult run(List<T> list, Comparator<T> cmp, int threadNumb) {
+        List<T> expected = 
+            new ArrayList<>(list)
+                .stream().sorted(cmp).toList();
 
         var timer = new Timer();
         timer.start();
-        ParallelShellSort.sort(list, Integer::compare, threadNumb);
+        ParallelShellSort.sort(list, cmp, threadNumb);
         timer.end();
 
         if (!expected.equals(list)) 
             throw new IllegalStateException("List is not sorted");
 
-        return new TestResult(list.size(), timer.resultTime(), threadNumb);
+        return new TestResult(
+            list.size(), 
+            timer.resultTime(), 
+            threadNumb, 
+            list.get(0).getClass().getName()
+        );
     }
 
-    public static TestResult run(List<Integer> list, int threadNumb, int threadGapLen) {
-        List<Integer> expected = new ArrayList<>(list);
-        expected.sort(Integer::compare);
+    public static <T> TestResult run(List<T> list, Comparator<T> cmp, int threadNumb, int threadGapLen) {
+        List<T> expected = 
+            new ArrayList<>(list)
+                .stream().sorted(cmp).toList();
 
         var timer = new Timer();
         timer.start();
-        ParallelShellSort.sort(list, Integer::compare, threadNumb);
+        ParallelShellSort.sort(list, cmp, threadNumb);
         timer.end();
 
         if (!expected.equals(list)) 
             throw new IllegalStateException("List is not sorted");
 
-        return new TestResult(list.size(), timer.resultTime(), threadNumb);
+        return new TestResult(
+            list.size(), 
+            timer.resultTime(), 
+            threadNumb, 
+            list.get(0).getClass().getName()
+        );
     }
 
     //public static List<>//TODO

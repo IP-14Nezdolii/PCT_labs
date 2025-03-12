@@ -75,6 +75,21 @@ public class ShellSortTest {
         assertEquals("Список з одним елементом повинен залишитися незмінним", expected, list);
     }
 
+    @Test
+    public void testTwoElementList() {
+        List<Integer> list1 = new ArrayList<>(Arrays.asList(42, 36));
+        List<Integer> list2 = new ArrayList<>(Arrays.asList(36, 42));
+        List<Integer> expected = Arrays.asList(36, 42);
+
+        Comparator<Integer> comp = Integer::compare;
+        
+        ShellSort.sort(list1, comp);
+        ShellSort.sort(list2, comp);
+        
+        assertEquals("Список з одним елементом повинен залишитися незмінним", expected, list1);
+        assertEquals("Список з одним елементом повинен залишитися незмінним", expected, list2);
+    }
+
     // Тест для списку з дублікатами
     @Test
     public void testListWithDuplicates() {

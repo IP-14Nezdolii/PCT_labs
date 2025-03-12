@@ -18,14 +18,11 @@ public class Bencher {
         //         genList(4_000_000, bound, seed), 8)
         // );
 
-        System.out.println(
-            Tester.run(
-                genList(40_000_000, bound, seed), 8)
-        );
-        // System.out.println(
-        //     Tester.run(
-        //         genList(40_000_000, bound, seed), 1)
-        // );
+        System.out.println(Tester.run(
+                genList(10_000_000, bound, seed), 
+                Integer::compareTo, 
+                8
+        ));
     }
 
     static List<Integer> genList(int size, int bound, long seed) {

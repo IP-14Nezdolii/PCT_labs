@@ -20,14 +20,14 @@ public class ParallelShellSort extends ShellSort {
 
     public static <T> void sort(
         List<T> list, 
-        Comparator<T> comp,
+        Comparator<T> cmp,
         int maxThreads,
         int threadSublistParam 
     ) {
         if (maxThreads > 1) 
-            (new Sorter<>(list, comp, maxThreads, threadSublistParam)).sort();
+            (new Sorter<>(list, cmp, maxThreads, threadSublistParam)).sort();
         else
-            sort(list, comp);
+            sort(list, cmp);
     }
 
     private static class Sorter<T> {
@@ -74,7 +74,7 @@ public class ParallelShellSort extends ShellSort {
                 T temp = list.get(i);
                 int j = i;
                 while (j >= elemGap && 
-                    comp.compare(list.get(j - elemGap), temp) > 0
+                        comp.compare(list.get(j - elemGap), temp) > 0
                 ){
                     list.set(j, list.get(j - elemGap));
                     j -= elemGap;

@@ -7,7 +7,7 @@ public class ShellSort {
 
     public static <T> void sort(
         List<T> list, 
-        Comparator<T> comp
+        Comparator<T> cmp
     ) {
         for (int gap = getStartGap(list.size()); gap > 0; gap /= 2) {
             for (int g = gap; g < gap + gap && g < list.size(); g++) {
@@ -15,7 +15,7 @@ public class ShellSort {
                     T temp = list.get(i);
                     int j = i;
                     while (j >= gap && 
-                        comp.compare(list.get(j - gap), temp) > 0
+                            cmp.compare(list.get(j - gap), temp) > 0
                     ){
                         list.set(j, list.get(j - gap));
                         j -= gap;
