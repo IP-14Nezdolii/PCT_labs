@@ -15,7 +15,11 @@ public class Tester {
         String sortedClassName
     ) {}
 
-    public static <T> TestResult run(List<T> list, Comparator<T> cmp, int threadNumb) {
+    public static <T> TestResult run(
+        List<T> list, 
+        Comparator<T> cmp, 
+        int threadNumb
+    ) {
         List<T> expected = 
             new ArrayList<>(list)
                 .stream().sorted(cmp).toList();
@@ -36,7 +40,12 @@ public class Tester {
         );
     }
 
-    public static <T> TestResult run(List<T> list, Comparator<T> cmp, int threadNumb, int threadGapLen) {
+    public static <T> TestResult run(
+        List<T> list, 
+        Comparator<T> cmp, 
+        int threadNumb, 
+        int threadSublistParam
+    ) {
         List<T> expected = 
             new ArrayList<>(list)
                 .stream().sorted(cmp).toList();
@@ -56,6 +65,4 @@ public class Tester {
             list.get(0).getClass().getName()
         );
     }
-
-    //public static List<>//TODO
 }

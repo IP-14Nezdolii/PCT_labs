@@ -33,6 +33,8 @@ public class Bencher {
             list.add(random.nextInt(bound));
         return list;
     }
+
+    //static
 }
 
 
