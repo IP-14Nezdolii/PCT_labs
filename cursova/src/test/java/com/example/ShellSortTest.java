@@ -79,6 +79,7 @@ public class ShellSortTest {
         ShellSort.sort(list2, cmp);
         
         List<Integer> expected = Arrays.asList(36, 42);
+
         assertEquals(
             "Список з одним елементом повинен залишитися незмінним", expected, list1
         );
@@ -111,7 +112,7 @@ public class ShellSortTest {
         }
         Comparator<Integer> cmp = Integer::compare;
 
-        List<Integer> expected = new ArrayList<>(list).stream().sorted(cmp).toList();
+        List<Integer> expected = list.stream().sorted(cmp).toList();
         ShellSort.sort(list, cmp);
         
         assertEquals(
@@ -132,7 +133,7 @@ public class ShellSortTest {
             for (int j = 0; j < list.size(); j++) 
                 list.add(random.nextInt(100));
 
-            List<Integer> expected = new ArrayList<>(list).stream().sorted(cmp).toList();
+            List<Integer> expected = list.stream().sorted(cmp).toList();
             ShellSort.sort(list, cmp);
 
             assertEquals(

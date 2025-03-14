@@ -1,6 +1,5 @@
 package com.example.test;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -16,21 +15,14 @@ public class Tester {
         String sortedClassName
     ) {}
 
-    public record Params(
-        int from, 
-        int to, 
-        int num
-    ) {}
-
     public static <T> TestResult run(
         List<T> list, 
         Comparator<T> cmp, 
         int threadNumb, 
         int sublistParam
     ) {
-        List<T> expected = 
-            new ArrayList<>(list)
-                .stream().sorted(cmp).toList();
+        List<T> expected = list
+            .stream().sorted(cmp).toList();
 
         var timer = new Timer();
         timer.start();

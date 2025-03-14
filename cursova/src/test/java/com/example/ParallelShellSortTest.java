@@ -139,7 +139,7 @@ public class ParallelShellSortTest {
                 list.add(random.nextInt(bound));
             }
             
-            List<Integer> expected = new ArrayList<>(list).stream().sorted(cmp).toList();
+            List<Integer> expected = list.stream().sorted(cmp).toList();
             ParallelShellSort.sort(list, cmp, 4);
 
             assertEquals(
@@ -164,7 +164,8 @@ public class ParallelShellSortTest {
                     list.add(random.nextInt(100));
 
                 ArrayList<Integer> old = new ArrayList<>(list);
-                List<Integer> expected = new ArrayList<>(list).stream().sorted(cmp).toList();
+                List<Integer> expected = list.stream().sorted(cmp).toList()
+;
                 ParallelShellSort.sort(list, cmp, 4);
 
                 assertEquals(old.toString(), expected, list);

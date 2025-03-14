@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.Function;
 
-import com.example.test.Tester.Params;
 import com.example.test.Tester.TestResult;
 
 public class TestScenario<T> {
@@ -21,6 +20,12 @@ public class TestScenario<T> {
     private final Function<Integer, List<T>> listGenerator;
     private final Comparator<T> cmp;
     private final int retestNumb;
+
+    private record Params(
+        int from, 
+        int to, 
+        int val
+    ) {}
 
     private TestScenario(
         Function<Integer, List<T>> listGenerator, 
@@ -40,18 +45,18 @@ public class TestScenario<T> {
         return new TestScenario<T>(listGenerator, cmp, retestNumb);
     }
 
-    public TestScenario<T> addLengthParams(Params params) {
-        lengthParams.add(params);
+    public TestScenario<T> addLengthParams(int from, int to, int val) {
+        lengthParams.add(new Params(from, to, val));
         return this;
     }
 
-    public TestScenario<T> addThreadNumbParams(Params params) {
-        threadNumbParams.add(params);
+    public TestScenario<T> addThreadNumbParams(int from, int to, int val) {
+        threadNumbParams.add(new Params(from, to, val));
         return this;
     }
 
-    public TestScenario<T> addSublistParamParams(Params params) {
-        sublistParamParams.add(params);
+    public TestScenario<T> addSublistParamParams(int from, int to, int val) {
+        sublistParamParams.add(new Params(from, to, val));
         return this;
     }
 
@@ -62,6 +67,16 @@ public class TestScenario<T> {
         return results;
     }
 
+    public void outputResults() {
+        for (Params length : lengthParams) {
+            for (Params threadNumb : threadNumbParams) {
+                for (Params sublistParamParam : sublistParamParams) {
+                    outputParamResults(results, length, threadNumb, sublistParamParam);
+                }
+            }
+        }
+    }
+
     private void startScenatio() {
         for (Params length : lengthParams) {
             for (Params threadNumb : threadNumbParams) {
@@ -69,15 +84,15 @@ public class TestScenario<T> {
 
                     for (int listSize = length.from(); 
                         listSize <= length.to(); 
-                        listSize *= length.num()
+                        listSize *= length.val()
                     ) {
                         for (int threadNum = threadNumb.from(); 
                             threadNum <= threadNumb.to(); 
-                            threadNum += threadNumb.num()
+                            threadNum += threadNumb.val()
                         ) {
                             for (int sublistParam = sublistParamParam.from(); 
                                 sublistParam <= sublistParamParam.to(); 
-                                sublistParam += sublistParamParam.num()
+                                sublistParam += sublistParamParam.val()
                             ) {
 
                                 if (!lists.containsKey(listSize))
@@ -92,5 +107,51 @@ public class TestScenario<T> {
                 }
             }
         }
+    }
+
+    private static void outputParamResults(
+        List<TestResult> results,
+        Params length,
+        Params threadNumb,
+        Params sublistParamParam
+    ) {
+        System.out.println(
+            "-------------| "+ results.get(0).sortedClassName() +" |-------------");
+        System.out.println(
+            "-----------------------------------------------");
+        System.out.printf(
+            "%-10s | %-10s | %-10s | %-5s%n","ListSize", "ThreadNum", "SublistParam", "AvgTime");
+
+        for (int listSize = length.from(); 
+            listSize <= length.to(); 
+            listSize *= length.val()
+        ) {
+            for (int threadNum = threadNumb.from(); 
+                threadNum <= threadNumb.to(); 
+                threadNum += threadNumb.val()
+            ) {
+                for (int sublistParam = sublistParamParam.from(); 
+                    sublistParam <= sublistParamParam.to(); 
+                    sublistParam += sublistParamParam.val()
+                ) {
+                    final int finalListSize = listSize;
+                    final int finalThreadNum = threadNum;
+                    final int finalSublistParam = sublistParam;
+
+                    double avgTime = results.stream()
+                        .filter(result -> result.size() == finalListSize)
+                        .filter(result -> result.threadNumb() == finalThreadNum)
+                        .filter(result -> result.sublistParam() == finalSublistParam)
+                        .mapToDouble(result -> result.time())
+                        .average()
+                        .getAsDouble();
+     
+                    System.out.printf("%-10s | %-10s | %-12s | %-5.3f%n", listSize, threadNum, sublistParam, avgTime);
+                }
+            }
+        }
+        System.out.println(
+            "-----------------------------------------------");
+        System.out.println();
     }
 }
