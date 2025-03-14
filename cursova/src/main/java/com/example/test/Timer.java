@@ -5,20 +5,20 @@ public class Timer {
     private long end = 0;
 
     public double start() {
-        this.start = System.currentTimeMillis();
+        this.start = System.nanoTime();
         return this.start;
     }
 
     public double end() {
-        this.end = System.currentTimeMillis();
+        this.end = System.nanoTime();
         return this.end;
     }
 
-    public double resultTimeMillis() {
+    public double resultNanoTime() {
         return end - start;
     }
 
-    public double resultTime() {
-        return (end - start)/1_000.0;
+    public double resultMicroTime() {
+        return (end - start)/1000.0;
     }
 }

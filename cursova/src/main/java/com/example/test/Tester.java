@@ -32,7 +32,7 @@ public class Tester {
 
         return new TestResult(
             list.size(), 
-            timer.resultTime(), 
+            timer.resultMicroTime(), 
             threadNumb, 
             sublistParam,
             list.get(0).getClass().getName()
