@@ -17,13 +17,11 @@ public class Tester {
 
     public static <T> TestResult run(
         List<T> list, 
+        List<T> expected,
         Comparator<T> cmp, 
         int threadNumb, 
         int sublistParam
     ) {
-        List<T> expected = list
-            .stream().sorted(cmp).toList();
-
         var timer = new Timer();
         timer.start();
         ParallelShellSort.sort(list, cmp, threadNumb);

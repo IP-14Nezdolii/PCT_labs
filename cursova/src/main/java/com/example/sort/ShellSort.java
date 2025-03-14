@@ -9,7 +9,7 @@ public class ShellSort {
         List<T> list, 
         Comparator<T> cmp
     ) {
-        for (int gap = getStartGap(list.size()); gap > 0; gap /= 2) {
+        for (int gap = list.size()/2; gap > 0; gap /= 2) {
             for (int g = gap; g < gap + gap && g < list.size(); g++) {
                 for (int i = g; i < list.size(); i+=gap) {
                     T temp = list.get(i);
@@ -24,14 +24,5 @@ public class ShellSort {
                 }
             }
         }
-    }
-
-    protected static int getStartGap(int len) {
-        int gap = 0;
-
-        for (int i = 0; gap <= len; i++) 
-            gap = (1 << i) - 1;
-
-        return gap / 2;
     }
 }

@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.example.TaskService;
 
-public class ParallelShellSort extends ShellSort {
+public class ParallelShellSort {
 
     public static <T> void sort(
         List<T> list, 
@@ -15,7 +15,7 @@ public class ParallelShellSort extends ShellSort {
         if (maxThreads > 1) 
             (new Sorter<>(list, cmp, maxThreads, 20)).sort();
         else
-            sort(list, cmp);
+            ShellSort.sort(list, cmp);
     }
 
     public static <T> void sort(
@@ -27,7 +27,7 @@ public class ParallelShellSort extends ShellSort {
         if (maxThreads > 1) 
             (new Sorter<>(list, cmp, maxThreads, sublistParam)).sort();
         else
-            sort(list, cmp);
+            ShellSort.sort(list, cmp);
     }
 
     private static class Sorter<T> {
@@ -50,12 +50,10 @@ public class ParallelShellSort extends ShellSort {
 
             this.list = list;
             this.cmp = cmp;
-
-            elemGap = getStartGap(list.size());
         }
 
         public void sort() {
-            for (elemGap = getStartGap(list.size()); elemGap > 0; elemGap /= 2) {
+            for (elemGap = list.size()/2; elemGap > 0; elemGap /= 2) {
 
                 if (list.size() / elemGap <= sublistParam || elemGap == 1) {
                     for (int g = elemGap; g < elemGap*2 && g < list.size(); g++)

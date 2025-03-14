@@ -19,8 +19,7 @@ public class App
         sortModified(new ArrayList<>(list), cmp);
         System.out.println();
 
-
-        Test.run(0, 10);
+        //Test.run(0, 5);
     }
 
     public static <T> void sort(
@@ -44,7 +43,7 @@ public class App
     }
 
     public static <T> void sortModified(
-    List<T> list, 
+        List<T> list, 
         Comparator<T> cmp
     ) {
         for (int gap = list.size()/2; gap > 0; gap /= 2) {

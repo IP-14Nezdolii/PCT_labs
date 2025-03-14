@@ -16,22 +16,22 @@ public class Test {
         var scenario1 = TestScenario.makeScenario(
             integerListGenerator, Comparator.naturalOrder(), retestNumb
         )
-            .addLengthParams(1_000_000, 10_000_000, 10)
+            .addLengthParams(20_000_000, 20_000_000, 10)
             .addThreadNumbParams(1, 1, 1)
             .addSublistParamParams(1, 1, 1);
 
         scenario1.start();
         scenario1.outputResults();
 
-        var scenario2 = TestScenario.makeScenario(
-            integerListGenerator, Comparator.naturalOrder(), retestNumb
-        )
-            .addLengthParams(1_000_000, 10_000_000, 10)
-            .addThreadNumbParams(2, 8, 2)
-            .addSublistParamParams(10, 30, 5);
+        // var scenario2 = TestScenario.makeScenario(
+        //     integerListGenerator, Comparator.naturalOrder(), retestNumb
+        // )
+        //     .addLengthParams(1_000_000, 10_000_000, 10)
+        //     .addThreadNumbParams(2, 8, 2)
+        //     .addSublistParamParams(10, 30, 5);
 
-        scenario2.start();
-        scenario2.outputResults();
+        // scenario2.start();
+        // scenario2.outputResults();
     }
 
     private static List<Integer> genList(int size, int bound, long seed) {

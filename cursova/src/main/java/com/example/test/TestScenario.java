@@ -12,6 +12,7 @@ public class TestScenario<T> {
     private final List<TestResult> results = new ArrayList<>();
 
     private final HashMap<Integer, List<T>> lists = new HashMap<>();
+    private final HashMap<Integer, List<T>> expectedLists = new HashMap<>();
 
     private final List<Params> lengthParams = new ArrayList<>();
     private final List<Params> threadNumbParams = new ArrayList<>();
@@ -94,12 +95,20 @@ public class TestScenario<T> {
                                 sublistParam <= sublistParamParam.to(); 
                                 sublistParam += sublistParamParam.val()
                             ) {
+                                if (!lists.containsKey(listSize)) {
+                                    List<T> list = listGenerator.apply(listSize);
+                                    List<T> expected = list.stream().sorted(cmp).toList();
 
-                                if (!lists.containsKey(listSize))
-                                    lists.put(listSize, listGenerator.apply(listSize));
-
+                                    lists.put(listSize, list);
+                                    expectedLists.put(listSize, expected);
+                                }
+                                    
                                 results.add(Tester.run(
-                                        new ArrayList<>(lists.get(listSize)), cmp, threadNum, sublistParam
+                                    new ArrayList<>(lists.get(listSize)),
+                                    expectedLists.get(listSize), 
+                                    cmp,
+                                    threadNum, 
+                                    sublistParam
                                 ));
                             }
                         }
