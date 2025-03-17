@@ -3,7 +3,7 @@ package com.example.test;
 import java.util.Comparator;
 import java.util.List;
 
-import com.example.sort.ParallelShellSort;
+import com.example.sort.ParallelShell;
 
 public class Tester {
     
@@ -24,7 +24,7 @@ public class Tester {
     ) {
         var timer = new Timer();
         timer.start();
-        ParallelShellSort.sort(list, cmp, threadNumb);
+        ParallelShell.sort(list, cmp, threadNumb);
         timer.end();
 
         if (!expected.equals(list)) 

@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.example.TaskService;
 
-public class ParallelShellSort {
+public class ParallelShell {
 
     public static <T> void sort(
         List<T> list, 
@@ -13,9 +13,9 @@ public class ParallelShellSort {
         int maxThreads
     ) {
         if (maxThreads > 1) 
-            (new Sorter<>(list, cmp, maxThreads, 20)).sort();
+            (new Sorter<>(list, cmp, maxThreads, 1092)).sort();
         else
-            ShellSort.sort(list, cmp);
+            Shell.sort(list, cmp);
     }
 
     public static <T> void sort(
@@ -27,7 +27,7 @@ public class ParallelShellSort {
         if (maxThreads > 1) 
             (new Sorter<>(list, cmp, maxThreads, sublistParam)).sort();
         else
-            ShellSort.sort(list, cmp);
+            Shell.sort(list, cmp);
     }
 
     private static class Sorter<T> {
@@ -36,7 +36,7 @@ public class ParallelShellSort {
         private final List<T> list;
         private final Comparator<T> cmp;
 
-        private int elemGap;
+        private int h;
         private int sublistParam;
 
         public Sorter(
@@ -53,13 +53,13 @@ public class ParallelShellSort {
         }
 
         public void sort() {
-            for (elemGap = list.size()/2; elemGap > 0; elemGap /= 2) {
+            for (h = knuthGap(); h > 0; h /= 3) {
 
-                if (list.size() / elemGap <= sublistParam || elemGap == 1) {
-                    for (int g = elemGap; g < elemGap*2 && g < list.size(); g++)
-                        gapSort(g);
+                if (list.size() / h <= sublistParam || h == 1) {
+                    for (int g = h; g < h*2; g++)
+                        gapInsertionSort(g);
                 } else {
-                    for (int g = elemGap; g < elemGap*2 && g < list.size(); g++) 
+                    for (int g = h; g < h*2; g++) 
                         service.addTask(createTask(g));
                     service.waitTasks();
                 }
@@ -67,24 +67,31 @@ public class ParallelShellSort {
             service.stop();
         }
 
-        private void gapSort(int g) {
-            for (int i = g; i < list.size(); i+=elemGap) {
+        private void gapInsertionSort(int g) {
+            for (int i = g; i < list.size(); i+=h) {  
                 T temp = list.get(i);
                 int j = i;
-                while (j >= elemGap && 
-                        cmp.compare(list.get(j - elemGap), temp) > 0
-                ){
-                    list.set(j, list.get(j - elemGap));
-                    j -= elemGap;
-                }
+                for (;j >= h && cmp.compare(list.get(j - h), temp) > 0; j -= h)
+                    list.set(j, list.get(j - h));
                 list.set(j, temp);
             }
         }
 
         private Runnable createTask(int g) {
             return () -> {
-                gapSort(g);
+                gapInsertionSort(g);
             };
+        }
+
+        private int knuthGap() {
+            int h = 1;
+
+            double sz = Math.ceil(list.size()/9.0);
+
+            while (h < sz) 
+                h = 3*h + 1;
+            
+            return h;
         }
     }
 }

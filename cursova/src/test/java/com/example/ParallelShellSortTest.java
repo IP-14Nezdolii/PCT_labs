@@ -11,10 +11,10 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import com.example.sort.ParallelShellSort;
+import com.example.sort.ParallelShell;
 
 public class ParallelShellSortTest {
-    private final long seed = 0;
+    private final long seed = 10;
     private final long maxThreads = 10;
 
     @Test
@@ -24,7 +24,7 @@ public class ParallelShellSortTest {
             List<Integer> list = Arrays.asList(1, 2, 3, 4, 5);
             Comparator<Integer> comp = Integer::compare;
             
-            ParallelShellSort.sort(list, comp, 4);
+            ParallelShell.sort(list, comp, 4);
 
             List<Integer> expected = Arrays.asList(1, 2, 3, 4, 5);
             assertEquals(
@@ -41,7 +41,7 @@ public class ParallelShellSortTest {
             List<Integer> list = Arrays.asList(5, 4, 3, 2, 1);
             Comparator<Integer> comp = Integer::compare;
             
-            ParallelShellSort.sort(list, comp, 4);
+            ParallelShell.sort(list, comp, 4);
             
             List<Integer> expected = Arrays.asList(1, 2, 3, 4, 5);
             assertEquals(
@@ -58,7 +58,7 @@ public class ParallelShellSortTest {
             List<Integer> list = new ArrayList<>();
             Comparator<Integer> comp = Integer::compare;
             
-            ParallelShellSort.sort(list, comp, 4);
+            ParallelShell.sort(list, comp, 4);
             
             assertTrue(
                 "Порожній список повинен залишитися порожнім", list.isEmpty()
@@ -74,7 +74,7 @@ public class ParallelShellSortTest {
             List<Integer> list = Arrays.asList(42);
             Comparator<Integer> comp = Integer::compare;
             
-            ParallelShellSort.sort(list, comp, 4);
+            ParallelShell.sort(list, comp, 4);
             
             List<Integer> expected = Arrays.asList(42);
             assertEquals(
@@ -93,8 +93,8 @@ public class ParallelShellSortTest {
             
             Comparator<Integer> comp = Integer::compare;
             
-            ParallelShellSort.sort(list1, comp, 4);
-            ParallelShellSort.sort(list2, comp, 4);
+            ParallelShell.sort(list1, comp, 4);
+            ParallelShell.sort(list2, comp, 4);
             
             List<Integer> expected = Arrays.asList(36, 42);
             assertEquals(
@@ -103,7 +103,6 @@ public class ParallelShellSortTest {
             assertEquals(
                 "Список з одним елементом повинен залишитися незмінним", expected, list2
             );
-            
         }
     }
 
@@ -114,7 +113,7 @@ public class ParallelShellSortTest {
             List<Integer> list = Arrays.asList(3, 1, 4, 1, 5, 9, 2, 6, 5, 3);
             Comparator<Integer> comp = Integer::compare;
             
-            ParallelShellSort.sort(list, comp, 4);
+            ParallelShell.sort(list, comp, 4);
             
             List<Integer> expected = Arrays.asList(1, 1, 2, 3, 3, 4, 5, 5, 6, 9);
             assertEquals(
@@ -126,26 +125,26 @@ public class ParallelShellSortTest {
 
     @Test
     public void testLargeRandomList() {
+
+        int size = 10000;
+        int bound = 10000;
+
+        Random random = new Random(seed);
+        Comparator<Integer> cmp = Integer::compare;
+
+        List<Integer> old = new ArrayList<>(bound);
+        for (int i = 0; i < size; i++) {
+            old.add(random.nextInt(bound));
+        }
+        List<Integer> expected = old.stream().sorted(cmp).toList();
+
         for (int threadNumb = 2; threadNumb <= maxThreads; threadNumb++) {
-
-            int size = 10000;
-            int bound = 10000;
-
-            Random random = new Random(seed);
-            Comparator<Integer> cmp = Integer::compare;
-
-            List<Integer> list = new ArrayList<>(bound);
-            for (int i = 0; i < size; i++) {
-                list.add(random.nextInt(bound));
-            }
-            
-            List<Integer> expected = list.stream().sorted(cmp).toList();
-            ParallelShellSort.sort(list, cmp, 4);
+            List<Integer> list = new ArrayList<>(old);
+            ParallelShell.sort(list, cmp, 4);
 
             assertEquals(
                 "Список не відсортовано: seeed="+seed+" size="+size+" bound="+bound, expected, list
             );
-            
         }
     }
 
@@ -166,7 +165,7 @@ public class ParallelShellSortTest {
                 ArrayList<Integer> old = new ArrayList<>(list);
                 List<Integer> expected = list.stream().sorted(cmp).toList()
 ;
-                ParallelShellSort.sort(list, cmp, 4);
+                ParallelShell.sort(list, cmp, 4);
 
                 assertEquals(old.toString(), expected, list);
             }

@@ -1,6 +1,5 @@
 package com.example;
 
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -12,17 +11,17 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import com.example.sort.ShellSort;
+import com.example.sort.Shell;
 
 public class ShellSortTest {
-    private long seed = 0;
+    private long seed = 10;
 
     @Test
     public void testSortedList() {
         List<Integer> list = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5));
         Comparator<Integer> cmp = Integer::compare;
         
-        ShellSort.sort(list, cmp);
+        Shell.sort(list, cmp);
         
         List<Integer> expected = Arrays.asList(1, 2, 3, 4, 5);
         assertEquals(
@@ -35,7 +34,7 @@ public class ShellSortTest {
         List<Integer> list = new ArrayList<>(Arrays.asList(5, 4, 3, 2, 1));
         Comparator<Integer> cmp = Integer::compare;
         
-        ShellSort.sort(list, cmp);
+        Shell.sort(list, cmp);
         
         List<Integer> expected = Arrays.asList(1, 2, 3, 4, 5);
         assertEquals(
@@ -48,7 +47,7 @@ public class ShellSortTest {
         List<Integer> list = new ArrayList<>();
         Comparator<Integer> cmp = Integer::compare;
         
-        ShellSort.sort(list, cmp);
+        Shell.sort(list, cmp);
         
         assertTrue(
             "Порожній список повинен залишитися порожнім", list.isEmpty()
@@ -60,7 +59,7 @@ public class ShellSortTest {
         List<Integer> list = new ArrayList<>(Arrays.asList(42));
         Comparator<Integer> cmp = Integer::compare;
         
-        ShellSort.sort(list, cmp);
+        Shell.sort(list, cmp);
         
         List<Integer> expected = Arrays.asList(42);
         assertEquals(
@@ -75,8 +74,8 @@ public class ShellSortTest {
         
         Comparator<Integer> cmp = Integer::compare;
         
-        ShellSort.sort(list1, cmp);
-        ShellSort.sort(list2, cmp);
+        Shell.sort(list1, cmp);
+        Shell.sort(list2, cmp);
         
         List<Integer> expected = Arrays.asList(36, 42);
 
@@ -93,7 +92,7 @@ public class ShellSortTest {
         List<Integer> list = new ArrayList<>(Arrays.asList(3, 1, 4, 1, 5, 9, 2, 6, 5, 3));
         Comparator<Integer> cmp = Integer::compare;
         
-        ShellSort.sort(list, cmp);
+        Shell.sort(list, cmp);
         
         List<Integer> expected = Arrays.asList(1, 1, 2, 3, 3, 4, 5, 5, 6, 9);
         assertEquals(
@@ -113,7 +112,7 @@ public class ShellSortTest {
         Comparator<Integer> cmp = Integer::compare;
 
         List<Integer> expected = list.stream().sorted(cmp).toList();
-        ShellSort.sort(list, cmp);
+        Shell.sort(list, cmp);
         
         assertEquals(
             "Список з дублікатами повинен бути відсортований", expected, list
@@ -134,7 +133,7 @@ public class ShellSortTest {
                 list.add(random.nextInt(100));
 
             List<Integer> expected = list.stream().sorted(cmp).toList();
-            ShellSort.sort(list, cmp);
+            Shell.sort(list, cmp);
 
             assertEquals(
                 "Список з дублікатами повинен бути відсортований", expected, list

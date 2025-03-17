@@ -6,7 +6,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 public class TaskService {
-    private final ExecutorService executor;
+    private final ExecutorService executorService;
     private final Semaphore semaphore;
 
     private final int maxThreads;
@@ -16,14 +16,14 @@ public class TaskService {
         this.maxThreads = maxThreads;
         this.waitingQueueSize = waitingQueueSize;
 
-        executor = Executors.newFixedThreadPool(maxThreads);
+        executorService = Executors.newFixedThreadPool(maxThreads);
         semaphore = new Semaphore(maxThreads + waitingQueueSize);
     }
 
     public void addTask(Runnable task) {
         try {
             semaphore.acquire();
-            executor.execute(() -> {
+            executorService.execute(() -> {
                 task.run();
                 semaphore.release();
             });
@@ -44,18 +44,17 @@ public class TaskService {
     }
 
     public void stop() {
+        executorService.shutdown();
         waitTasks();
-        executor.shutdown();
 
-        if (executor.isTerminated())
+        if (executorService.isTerminated())
             return;
 
         try {
-            for (;;) {
-                if (executor.awaitTermination(1, TimeUnit.MILLISECONDS)) 
-                    break;  
-            }
+            if (!executorService.awaitTermination(10, TimeUnit.MILLISECONDS))
+                System.err.println("Pool did not terminate"); 
         } catch (InterruptedException e) {
+            executorService.shutdownNow();
             e.printStackTrace();
         }
     }

@@ -22,11 +22,19 @@ public class TestScenario<T> {
     private final Comparator<T> cmp;
     private final int retestNumb;
 
-    private record Params(
-        int from, 
-        int to, 
-        int val
-    ) {}
+    private static class Params {
+        int from;
+        int to; 
+        int mul;
+        int sum;
+
+        public Params(int from, int to, int mul, int sum) {
+            this.from = from;
+            this.to = to;
+            this.mul = mul;
+            this.sum = sum;
+        }
+    }
 
     private TestScenario(
         Function<Integer, List<T>> listGenerator, 
@@ -46,18 +54,18 @@ public class TestScenario<T> {
         return new TestScenario<T>(listGenerator, cmp, retestNumb);
     }
 
-    public TestScenario<T> addLengthParams(int from, int to, int val) {
-        lengthParams.add(new Params(from, to, val));
+    public TestScenario<T> addLengthParams(int from, int to, int sum, int mul) {
+        lengthParams.add(new Params(from, to, mul, sum));
         return this;
     }
 
-    public TestScenario<T> addThreadNumbParams(int from, int to, int val) {
-        threadNumbParams.add(new Params(from, to, val));
+    public TestScenario<T> addThreadNumbParams(int from, int to, int sum, int mul) {
+        threadNumbParams.add(new Params(from, to, mul, sum));
         return this;
     }
 
-    public TestScenario<T> addSublistParamParams(int from, int to, int val) {
-        sublistParamParams.add(new Params(from, to, val));
+    public TestScenario<T> addSublistParamParams(int from, int to, int sum, int mul) {
+        sublistParamParams.add(new Params(from, to, mul, sum));
         return this;
     }
 
@@ -83,17 +91,17 @@ public class TestScenario<T> {
             for (Params threadNumb : threadNumbParams) {
                 for (Params sublistParamParam : sublistParamParams) {
 
-                    for (int listSize = length.from(); 
-                        listSize <= length.to(); 
-                        listSize *= length.val()
+                    for (int listSize = length.from; 
+                        listSize <= length.to; 
+                        listSize += length.sum
                     ) {
-                        for (int threadNum = threadNumb.from(); 
-                            threadNum <= threadNumb.to(); 
-                            threadNum += threadNumb.val()
+                        for (int threadNum = threadNumb.from; 
+                            threadNum <= threadNumb.to; 
+                            threadNum += threadNumb.sum
                         ) {
-                            for (int sublistParam = sublistParamParam.from(); 
-                                sublistParam <= sublistParamParam.to(); 
-                                sublistParam += sublistParamParam.val()
+                            for (int sublistParam = sublistParamParam.from; 
+                                sublistParam <= sublistParamParam.to; 
+                                sublistParam += sublistParamParam.sum
                             ) {
                                 if (!lists.containsKey(listSize)) {
                                     List<T> list = listGenerator.apply(listSize);
@@ -110,8 +118,12 @@ public class TestScenario<T> {
                                     threadNum, 
                                     sublistParam
                                 ));
+
+                                sublistParam *= sublistParamParam.mul;
                             }
+                            threadNum *= threadNumb.mul;
                         }
+                        listSize *= length.mul;
                     }
                 }
             }
@@ -131,17 +143,17 @@ public class TestScenario<T> {
         System.out.printf(
             "%-10s | %-10s | %-10s | %-5s%n","ListSize", "ThreadNum", "SublistParam", "AvgTime");
 
-        for (int listSize = length.from(); 
-            listSize <= length.to(); 
-            listSize *= length.val()
+        for (int listSize = length.from; 
+            listSize <= length.to; 
+            listSize += length.sum
         ) {
-            for (int threadNum = threadNumb.from(); 
-                threadNum <= threadNumb.to(); 
-                threadNum += threadNumb.val()
+            for (int threadNum = threadNumb.from; 
+                threadNum <= threadNumb.to; 
+                threadNum += threadNumb.sum
             ) {
-                for (int sublistParam = sublistParamParam.from(); 
-                    sublistParam <= sublistParamParam.to(); 
-                    sublistParam += sublistParamParam.val()
+                for (int sublistParam = sublistParamParam.from; 
+                    sublistParam <= sublistParamParam.to; 
+                    sublistParam += sublistParamParam.sum
                 ) {
                     final int finalListSize = listSize;
                     final int finalThreadNum = threadNum;
@@ -154,10 +166,14 @@ public class TestScenario<T> {
                         .mapToDouble(result -> result.time())
                         .average()
                         .getAsDouble();
+
+                    sublistParam *= sublistParamParam.mul;
      
                     System.out.printf("%-10s | %-10s | %-12s | %-5.3f%n", listSize, threadNum, sublistParam, avgTime);
                 }
+                threadNum *= threadNumb.mul;
             }
+            listSize *= length.mul;
         }
         System.out.println(
             "-----------------------------------------------");
