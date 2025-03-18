@@ -24,7 +24,7 @@ public class Shell {
     private static int knuthGap(int size) {
         int h = 1;
 
-        while (h < size/9) 
+        while (h <= size/9) 
             h = 3*h + 1;
         
         return h;

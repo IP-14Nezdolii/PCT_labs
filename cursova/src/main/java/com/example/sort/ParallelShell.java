@@ -88,7 +88,7 @@ public class ParallelShell {
 
             double sz = Math.ceil(list.size()/9.0);
 
-            while (h < sz) 
+            while (h <= sz) 
                 h = 3*h + 1;
             
             return h;
