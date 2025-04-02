@@ -9,16 +9,22 @@ import java.util.List;
 
 public class Document {
     private final List<String> lines;
+    private final String filename;
 
-    Document(List<String> lines) {
+    Document(List<String> lines, String filename) {
         this.lines = lines;
+        this.filename = filename;
+    }
+
+    public String getFilename() {
+        return filename;
     }
 
     public List<String> getLines() {
         return this.lines;
     }
 
-    static Document fromFile(File file) throws IOException {
+    public static Document fromFile(File file) throws IOException {
         List<String> lines = new LinkedList<>();
         try(BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line = reader.readLine();
@@ -27,6 +33,6 @@ public class Document {
                 line = reader.readLine();
             }
         }
-        return new Document(lines);
+        return new Document(lines, file.getAbsolutePath());
     }
 }

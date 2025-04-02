@@ -1,11 +1,11 @@
 package com.example.task1;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,20 +13,17 @@ import com.example.utils.Document;
 import com.example.utils.Folder;
 
 public class WordCounter {
-    private ForkJoinPool forkJoinPool;
 
     private static final int THRESHOLD = 100000;
     private static final int N_THEADS = 8;
+    private static final int INITIAL_CAPACITY = 20;
 
     private static final Pattern WORD_PATTERN = 
-        Pattern.compile("\\p{L}+('\\p{L}+)*", Pattern.CASE_INSENSITIVE);
-    
-    // String[] wordsIn(String line) {
-    //     return line.trim().split("(\\s|\\p{Punct})+");
-    // }
+        Pattern.compile("\\p{L}+('\\p{L}+)*"); //ATAGATGCATAGCGCATAGCTAGATGTGCTAGC
 
-    private List<Integer> wordsLengthsInLines(List<String> lines) {
-        List<Integer> lengths = new ArrayList<>(lines.size() * 15);
+    private Map<Integer, Integer> wordsLengthsInLines(List<String> lines) {
+        Map<Integer, Integer> lengths = new HashMap<>(INITIAL_CAPACITY);
+
         for (String line : lines) {
 
             if (line == null || line.isEmpty()) {
@@ -35,42 +32,39 @@ public class WordCounter {
             
             Matcher matcher = WORD_PATTERN.matcher(line);       
             while (matcher.find()) {
-                lengths.add(matcher.group().length());
+                
+                lengths.merge(
+                    matcher.group().length(), 
+                    1, 
+                    Integer::sum
+                );
             };
         }
         return lengths;
     }
 
-    public List<Integer> getWordsLengthsInParallel(Folder folder) {   
-        List<Integer> result = new ArrayList<>();
+    public Map<Integer, Integer> getWordsLengthsInParallel(Folder folder) {   
+        Map<Integer, Integer> result = new HashMap<>(INITIAL_CAPACITY);
         
-        try {
-            forkJoinPool = new ForkJoinPool(N_THEADS);
-            result = forkJoinPool.invoke(new FolderSearchTask(folder));  
-            
-            forkJoinPool.shutdown();
-            if (!forkJoinPool.awaitTermination(5, TimeUnit.MILLISECONDS)) {
-                forkJoinPool.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } 
+        try (ForkJoinPool forkJoinPool = new ForkJoinPool(N_THEADS)) {
+            result = forkJoinPool.invoke(new FolderSearchTask(folder));
+        }
 
         return result;
     }
 
-    public List<Integer> getWordsLengthsOnSingleThread(Folder folder) {
-        List<Integer> result = new ArrayList<>();
+    public Map<Integer, Integer> getWordsLengthsOnSingleThread(Folder folder) {
+        Map<Integer, Integer> result = new HashMap<>(INITIAL_CAPACITY);
         for (Folder subFolder : folder.getSubFolders()) {
-            result.addAll(getWordsLengthsOnSingleThread(subFolder));
+            mergeMaps(result, getWordsLengthsOnSingleThread(subFolder));
         }
         for (Document document : folder.getDocuments()) {
-            result.addAll(wordsLengthsInLines(document.getLines()));
+            mergeMaps(result, wordsLengthsInLines(document.getLines()));
         }
         return result;
     }
 
-    private class DocumentSearchTask extends RecursiveTask<List<Integer>> {
+    private class DocumentSearchTask extends RecursiveTask<Map<Integer, Integer>> {
         private final List<String> lines;
     
         DocumentSearchTask(List<String> documentLines) {
@@ -79,8 +73,8 @@ public class WordCounter {
         }
 
         @Override
-        protected List<Integer> compute() {
-            List<Integer> result;
+        protected Map<Integer, Integer> compute() {
+            Map<Integer, Integer> result = null;
 
             if (lines.size() > THRESHOLD) {
                 int mid = lines.size() / 2;
@@ -93,8 +87,8 @@ public class WordCounter {
                 );
 
                 task2.fork();
-                result = task1.compute();        
-                result.addAll(task2.join());
+                result = task1.compute();  
+                mergeMaps(result, task2.join());
             } else {
                 result = wordsLengthsInLines(lines);
             }
@@ -103,7 +97,7 @@ public class WordCounter {
         }
     }
 
-    private class FolderSearchTask extends RecursiveTask<List<Integer>> {
+    private class FolderSearchTask extends RecursiveTask<Map<Integer, Integer>> {
         private final Folder folder;
       
         public FolderSearchTask(Folder folder) {
@@ -112,10 +106,10 @@ public class WordCounter {
         }
       
         @Override
-        protected List<Integer> compute() {
-        List<Integer> result = new ArrayList<>();
+        protected Map<Integer, Integer> compute() {
+        Map<Integer, Integer> result = new HashMap<>(INITIAL_CAPACITY);
 
-          List<RecursiveTask<List<Integer>>> forks = new LinkedList<>();
+          List<RecursiveTask<Map<Integer, Integer>>> forks = new LinkedList<>();
           for (Folder subFolder : folder.getSubFolders()) {
             FolderSearchTask task = new FolderSearchTask(subFolder);
             forks.add(task);
@@ -127,11 +121,20 @@ public class WordCounter {
             task.fork();
           }
 
-          for (RecursiveTask<List<Integer>> task : forks) {
-            result.addAll(task.join());
+          for (var task : forks) {
+            mergeMaps(result, task.join());
           }
           return result;
         }
+    }
+
+    private void mergeMaps(
+        Map<Integer, Integer> m1, 
+        Map<Integer, Integer> m2
+    ) {
+        m2.forEach(
+            (key, value) -> m1.merge(key, value, (v1, v2) -> v1 + v2)
+        );
     }
 }
 
