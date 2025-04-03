@@ -16,7 +16,6 @@ public class StatisticsCalculator {
         System.out.println();
     }
 
-
     public static double calculateMean(Map<Integer, Integer> numbers) {
         if (numbers == null || numbers.isEmpty()) {
             return 0.0;

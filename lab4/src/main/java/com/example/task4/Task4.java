@@ -2,7 +2,6 @@ package com.example.task4;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
 
 import com.example.utils.Folder;
@@ -21,7 +20,7 @@ public class Task4 {
             List<String> filenames = searcher.getFileNames(folder, List.of(
                 "FileSearcher", "searcher"
             ));
-            System.out.println("Common words in: " + filenames);
+            System.out.println("Key words in: " + filenames);
 
         } catch (IOException e) {
             e.printStackTrace();

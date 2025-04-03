@@ -10,8 +10,8 @@ public class App
     public static void main( String[] args )
     {     
         //Task1.doTask(0, 0);
-        Task2.doTask(5, 5);
+        //Task2.doTask(5, 5);
         //Task3.doTask();
-        //Task4.doTask();
+        Task4.doTask();
     }
 }
