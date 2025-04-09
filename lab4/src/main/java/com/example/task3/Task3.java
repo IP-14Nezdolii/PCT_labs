@@ -9,7 +9,7 @@ public class Task3 {
     static public void doTask() {
         Set<String> words = wordCounter.getCommonWords(
             new File("lab4\\src\\main\\java\\com\\example\\task3\\testFolder\\file1.txt"), 
-            new File("lab4\\src\\main\\java\\com\\example\\task3\\testFolder\\file2.txt")
+            new File("lab4\\src\\main\\java\\com\\example\\task1\\testFolder2\\Algorithms 4th Ed.txt")
         );
 
         System.out.println("Common words: " + words);
