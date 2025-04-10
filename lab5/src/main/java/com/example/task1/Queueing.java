@@ -1,5 +1,7 @@
 package com.example.task1;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -51,24 +53,26 @@ public class Queueing {
         return min + random.nextLong(max - min);
     }
 
-    private void runProducer() {
-        try {
-            while ((System.currentTimeMillis() - startTime) < SIMULATION_TIME) {
-
-                totalArrivals++;
-                if (!queue.offer(new TaskObj(
-                        getRandomTime(MIN_SERVICE_TIME, MAX_SERVICE_TIME)))
-                ) {
-                    totalRejected++;
+    private Runnable createProducer() {
+        return () -> {
+            try {
+                while ((System.currentTimeMillis() - startTime) < SIMULATION_TIME) {
+    
+                    totalArrivals++;
+                    if (!queue.offer(new TaskObj(
+                            getRandomTime(MIN_SERVICE_TIME, MAX_SERVICE_TIME)))
+                    ) {
+                        totalRejected++;
+                    }
+                    Thread.sleep(getRandomTime(MIN_ARRIVAL_INTERVAL, MAX_ARRIVAL_INTERVAL));
                 }
-                Thread.sleep(getRandomTime(MIN_ARRIVAL_INTERVAL, MAX_ARRIVAL_INTERVAL));
+    
+                isRunning = false;
+    
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
-
-            isRunning = false;
-
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        };
     }
 
     private Runnable createConsumer() {
@@ -121,12 +125,20 @@ public class Queueing {
         isRunning = true;
         startTime = System.currentTimeMillis();
 
-        try(ExecutorService executor = Executors.newFixedThreadPool(CONSUMERS + 1)) {
+        try(ExecutorService executor = Executors.newFixedThreadPool(CONSUMERS + 2)) {
+            List<Callable<Result>> tasks = new ArrayList<>(CONSUMERS + 2);
             for (int i = 0; i < CONSUMERS; i++) {
-                executor.execute(createConsumer());
+                tasks.add(()-> {createConsumer().run();return null;});
             }
-            executor.execute(createReporter());
-            runProducer();
+            tasks.add(()-> {createReporter().run();return null;});
+            tasks.add(()-> {createProducer().run();return null;});
+
+            executor.invokeAll(tasks, SIMULATION_TIME, TimeUnit.MILLISECONDS);
+            
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } finally {
+            isRunning = false;
         }
     }
 

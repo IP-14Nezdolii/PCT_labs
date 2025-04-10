@@ -15,7 +15,7 @@ public class Task2 {
 
     public static void main(String[] args) {
         List<Callable<Result>> tasks = new ArrayList<>(RUNS);
-        tasks.add(() -> {return new Queueing(1, 1, true).simulate();});
+        tasks.add(() -> {return new Queueing(1, 1, false).simulate();});
         tasks.add(() -> {return new Queueing(1, 1, false).simulate();});
         tasks.add(() -> {return new Queueing(1, 2, false).simulate();});
         tasks.add(() -> {return new Queueing(1, 3, false).simulate();});
