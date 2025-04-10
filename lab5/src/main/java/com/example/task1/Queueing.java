@@ -1,7 +1,5 @@
 package com.example.task1;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -126,15 +124,22 @@ public class Queueing {
         startTime = System.currentTimeMillis();
 
         try(ExecutorService executor = Executors.newFixedThreadPool(CONSUMERS + 2)) {
-            List<Callable<Result>> tasks = new ArrayList<>(CONSUMERS + 2);
+            // List<Callable<Result>> tasks = new ArrayList<>(CONSUMERS + 2);
+            // for (int i = 0; i < CONSUMERS; i++) {
+            //     tasks.add(()-> {createConsumer().run();return null;});
+            // }
+            // tasks.add(()-> {createReporter().run();return null;});
+            // tasks.add(()-> {createProducer().run();return null;});
+            // executor.invokeAll(tasks, SIMULATION_TIME, TimeUnit.MILLISECONDS);
             for (int i = 0; i < CONSUMERS; i++) {
-                tasks.add(()-> {createConsumer().run();return null;});
+                executor.execute(createConsumer());
             }
-            tasks.add(()-> {createReporter().run();return null;});
-            tasks.add(()-> {createProducer().run();return null;});
+            executor.execute(createReporter());
+            executor.execute(createProducer());
 
-            executor.invokeAll(tasks, SIMULATION_TIME, TimeUnit.MILLISECONDS);
-            
+            if (executor.awaitTermination(SIMULATION_TIME + MAX_SERVICE_TIME, TimeUnit.MILLISECONDS)) {
+                executor.shutdownNow();
+            }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         } finally {
