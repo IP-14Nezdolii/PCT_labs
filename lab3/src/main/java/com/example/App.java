@@ -6,7 +6,7 @@ public class App
 {
     public static void main( String[] args )
     {
-        Test.run(5, 5, 10);
+        Test.run(5, 5, 0);
     }
 
 }
