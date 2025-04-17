@@ -8,16 +8,15 @@ public class BlockingComm extends Communicator {
 
     @Override
     public void sendBlocksToWorkers(Matrix[] aMatrix, Matrix[] bMatrix) throws MPIException {
-
         for (int i = 0; i < this.q; i++) {
+            int iPos = getPosByCounter(i);
             for (int j = 0; j < this.q; j++) {
-
                 int workerRank = toLinear(i, j) + 1;
 
                //System.out.printf("Sending blocks #%d with worker rank #%d%n", counter, workerRank);
 
-                buffer[0] = aMatrix[toLinear(i, getPosByCounter(i))];
-                buffer[1] = bMatrix[toLinear(getPosByCounter(i), j)];
+                buffer[0] = aMatrix[toLinear(i, iPos)];
+                buffer[1] = bMatrix[toLinear(iPos, j)];
 
                 MPI.COMM_WORLD.Send(
                     buffer, 0, 2, MPI.OBJECT, workerRank, workerRank);

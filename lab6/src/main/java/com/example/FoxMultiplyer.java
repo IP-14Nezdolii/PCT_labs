@@ -8,7 +8,7 @@ import mpi.MPI;
 import mpi.MPIException;
 
 public class FoxMultiplyer {
-    private static final int MATRIX_SIDE_SIZE = 720;
+    private static final int MATRIX_SIDE_SIZE = 360;
 
     public static void runMultiply(Communicator comm, boolean enableLog) throws MPIException {
         comm.initCommunicator(MPI.COMM_WORLD.Rank(), MPI.COMM_WORLD.Size() - 1);
@@ -19,8 +19,6 @@ public class FoxMultiplyer {
             Matrix b = Matrix.genRandomMatrix(
                 MATRIX_SIDE_SIZE, MATRIX_SIDE_SIZE, 2);
 
-            Matrix expected = Matrix.multiply(a,b);
-
             double start = System.currentTimeMillis() / 1000.0;
 
             Matrix[] aBlocks = Matrix.getBlocks(a, comm.getNWorkers());
@@ -30,7 +28,9 @@ public class FoxMultiplyer {
                 comm.sendBlocksToWorkers(aBlocks, bBlocks);
             }
 
-            Matrix c = Matrix.blocksToMatrix(comm.receiveBlocksFromWorkers());
+            Matrix c = Matrix.blocksToMatrix(
+                comm.receiveBlocksFromWorkers()
+            );
 
             if (enableLog) {
                 System.out.printf(
@@ -39,16 +39,19 @@ public class FoxMultiplyer {
                 );
             }
 
-            if (!c.equals(expected)) {
+            if (!c.equals(Matrix.multiply(a,b))) {
                 throw new RuntimeException(
                     "BAD!BAD!BAD!, matrixSideSize: "
                     + MATRIX_SIDE_SIZE
                 );
+            } else if (enableLog) {
+                System.out.println("true");
             }
             
         } else {
             Matrix[] blocks = comm.receiveBlocksFromMaster();
             Matrix cBlock = new Matrix(blocks[0].rows(), blocks[1].cols());
+
             multiplyAndAdd(cBlock, blocks[0], blocks[1]);
 
             while (comm.getCounter() < comm.getQ()) {

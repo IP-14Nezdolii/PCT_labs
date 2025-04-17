@@ -15,13 +15,13 @@ public class NonBlockingComm extends Communicator{
     @Override
     public void sendBlocksToWorkers(Matrix[] aMatrix, Matrix[] bMatrix) throws MPIException {
         for (int i = 0; i < this.q; i++) {
+            int iPos = getPosByCounter(i);
             for (int j = 0; j < this.q; j++) {
 
                 int workerRank = toLinear(i, j) + 1;
 
-
-                buffer[0] = aMatrix[toLinear(i, getPosByCounter(i))];
-                buffer[1] = bMatrix[toLinear(getPosByCounter(i), j)];
+                buffer[0] = aMatrix[toLinear(i, iPos)];
+                buffer[1] = bMatrix[toLinear(iPos, j)];
 
                 requests.add(
                     MPI.COMM_WORLD.Isend(buffer, 0, 2, MPI.OBJECT, workerRank, workerRank));
