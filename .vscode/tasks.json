@@ -26,17 +26,17 @@
             "dependsOn": ["Run daemon"],
             "problemMatcher": []
         },
-        {
-            "label": "Compile and Run MPJ App",
-            "type": "shell",
-            "command": "mpjrun.bat -np 5 -dev niodev -machinesfile C:\\Users\\vladi\\.vscode\\Git\\PCT\\PCT_labs\\.vscode\\machines com.example.App",
-            "group": "test",
-            "options": {
-                "cwd": "${workspaceFolder}\\lab6\\target\\classes"
-            },
-            "dependsOn": ["Compile Project", "Run daemon"],
-            "problemMatcher": []
-        },
+        // {
+        //     "label": "Compile and Run MPJ App",
+        //     "type": "shell",
+        //     "command": "mpjrun.bat -np 5 -dev niodev -machinesfile C:\\Users\\vladi\\.vscode\\Git\\PCT\\PCT_labs\\.vscode\\machines com.example.App",
+        //     "group": "test",
+        //     "options": {
+        //         "cwd": "${workspaceFolder}\\lab6\\target\\classes"
+        //     },
+        //     "dependsOn": ["Compile Project", "Run daemon"],
+        //     "problemMatcher": []
+        // },
         {
             "label": "Kill Java Processes",
             "type": "shell",

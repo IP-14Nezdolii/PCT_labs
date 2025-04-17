@@ -8,7 +8,7 @@ import mpi.MPI;
 import mpi.MPIException;
 
 public class FoxMultiplyer {
-    private static final int MATRIX_SIDE_SIZE = 360;
+    private static final int MATRIX_SIDE_SIZE = 720;
 
     public static void runMultiply(Communicator comm, boolean enableLog) throws MPIException {
         comm.initCommunicator(MPI.COMM_WORLD.Rank(), MPI.COMM_WORLD.Size() - 1);
@@ -34,12 +34,20 @@ public class FoxMultiplyer {
 
             if (enableLog) {
                 System.out.printf(
-                    "Total time: %-5.3f sec %n", 
+                    comm.getClass()+" total time: %-5.3f sec %n", 
                     System.currentTimeMillis() / 1000.0 - start
                 );
             }
 
-            if (!c.equals(Matrix.multiply(a,b))) {
+            start = System.currentTimeMillis() / 1000.0;
+            Matrix expected = Matrix.multiply(a,b);
+            if (enableLog) {
+                System.out.printf(
+                    "Single process total time: %-5.3f sec %n", 
+                    System.currentTimeMillis() / 1000.0 - start
+                );
+            }
+            if (!c.equals(expected)) {
                 throw new RuntimeException(
                     "BAD!BAD!BAD!, matrixSideSize: "
                     + MATRIX_SIDE_SIZE
