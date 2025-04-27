@@ -8,13 +8,13 @@ import mpi.MPI;
 import mpi.MPIException;
 
 public class FoxMultiplyer {
-    public static void runMultiply(
+    public static double runMultiply(
         Matrix a, 
         Matrix b, 
         Matrix expected,
-        Communicator comm, 
-        boolean enableLog
+        Communicator comm
     ) throws MPIException {
+        double totalTime = 0.0;
         comm.initCommunicator(MPI.COMM_WORLD.Rank(), MPI.COMM_WORLD.Size());
 
         if (comm.getRank() == Communicator.MASTER_RANK) { 
@@ -35,21 +35,14 @@ public class FoxMultiplyer {
                 comm.blocksShareToMaster(cBlock)
             );
 
-            if (enableLog) {
-                System.out.printf(
-                    comm.getClass()+" total time: %-5.3f sec %n", 
-                    System.currentTimeMillis() / 1000.0 - start
-                );
-            }
+            totalTime = System.currentTimeMillis() / 1000.0 - start;
+
             if (!c.equals(expected)) {
                 throw new RuntimeException(
                     "BAD!BAD!BAD!, matrixSideSize: "
                     + a.rows()
                 );
-            } else if (enableLog) {
-                System.out.println("true");
             }
-            
         } else {
             Matrix[] blocks = comm.blocksShareFromMaster(null, null);
             Matrix cBlock = new Matrix(blocks[0].rows(), blocks[1].cols());
@@ -62,6 +55,8 @@ public class FoxMultiplyer {
 
             comm.blocksShareToMaster(cBlock);
         }
+
+        return totalTime;
     }
 
     private static void multiplyAndAdd(MatrixBlock dest, MatrixBlock a, MatrixBlock b) {  
