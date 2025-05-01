@@ -1,144 +1,97 @@
 package com.example;
 
-import java.util.ArrayList;
-import java.util.List;
+import mpi.*;
 
-import com.example.communicator.ManyCommunicator;
-import com.example.communicator.ManyToManyComm;
-import com.example.communicator.ManyToOneComm;
-import com.example.communicator.OneToManyComm;
-import com.example.communicator.OneToOneComm;
-import com.example.utils.Matrix;
+//MPJExpress
+public class App {
+    final static int MASTER = 0;
 
-import mpi.MPI;
-
-public class App 
-{
-    static List<Double> SingleTime = new ArrayList<>(10);
-    static List<Double> OneToManyCommTime = new ArrayList<>(10);
-    static List<Double> OneToOneCommTime = new ArrayList<>(10);
-    static List<Double> ManyToManyCommTime = new ArrayList<>(10);
-    static List<Double> ManyToOneCommTime = new ArrayList<>(10);
-    static List<Double> ManyCommunicatorTime = new ArrayList<>(10);
-
-    static final int COUNT = 10;
-
-    public static void main( String[] args )
-    {
+    public static void main(String[] args) {
         MPI.Init(args);
 
-        run(1440,COUNT,0,false);
+        int rank = MPI.COMM_WORLD.Rank();
+        int size = MPI.COMM_WORLD.Size();
 
-        run(360,COUNT,0,true);
-        run(720,COUNT,0,true);
-        run(1440,COUNT,0,true);
+        final int n = 4;
+        int rowsPerProc = n / size;
+
+        if (n % size != 0) {
+            if (rank == 0) {
+                System.out.println(
+                    "BAD!BAD! The number of processes must divide the number of rows evenly."
+                );
+            }
+            MPI.Finalize();
+            return;
+        }
+
+        int[][] arr1 = null; 
+        int[][] arr2 = null;
+        int[] result = new int[n]; 
+
+        int[][] localA = new int[rowsPerProc][n];
+        int[][] localB = new int[rowsPerProc][n];
+        int[] localC = new int[rowsPerProc];
+
+        if (rank == MASTER ) {
+            arr1 = new int[n][n];
+            arr2 = new int[n][n];
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    arr1[i][j] = i + j + 1;
+                    arr2[i][j] = (i + 1) * (j + 1);
+                }
+            }
+        }
+
+        MPI.COMM_WORLD.Scatter(
+            flatten2D(arr1), 0, rowsPerProc * n, MPI.INT,
+            flatten2D(localA), 0, rowsPerProc * n, MPI.INT, 0
+        );
+        MPI.COMM_WORLD.Scatter(
+            flatten2D(arr2), 0, rowsPerProc * n, MPI.INT,
+            flatten2D(localB), 0, rowsPerProc * n, MPI.INT, 0
+        );
+
+        for (int i = 0; i < rowsPerProc; i++) {
+            int sumA = 0, sumB = 0;
+            for (int j = 0; j < n; j++) {
+                sumA += localA[i][j];
+                sumB += localB[i][j];
+            }
+            int avgA = sumA / n;
+            int avgB = sumB / n;
+            localC[i] = avgA * avgB;
+        }
+
+        MPI.COMM_WORLD.Gather(
+            localC, 0, rowsPerProc, MPI.INT,
+            result, 0, rowsPerProc, MPI.INT, 0
+        );
+
+        if (rank == MASTER ) {
+            System.out.print("Arr C: ");
+            for (int val : result) {
+                System.out.print(val + " ");
+            }
+            System.out.println();
+        }
 
         MPI.Finalize();
     }
 
-    static void test(
-        int count, 
-        Matrix a, 
-        Matrix b, 
-        Matrix expected
-    ) {
-        ManyToManyCommTime.clear();
-        ManyToOneCommTime.clear();
-        OneToManyCommTime.clear();
-        OneToOneCommTime.clear();
-        ManyCommunicatorTime.clear();
-
-        for (int i = 0; i < count; i++) {
-            MPI.COMM_WORLD.Barrier();
-            ManyToManyCommTime.add(
-                FoxMultiplyer.runMultiply(a, b, expected, new ManyToManyComm())
-            );
-
-            MPI.COMM_WORLD.Barrier();
-            ManyToOneCommTime.add(
-                FoxMultiplyer.runMultiply(a, b, expected, new ManyToOneComm())
-            );
-
-            MPI.COMM_WORLD.Barrier();
-            OneToManyCommTime.add(
-                FoxMultiplyer.runMultiply(a, b, expected, new OneToManyComm())
-            );
-
-            MPI.COMM_WORLD.Barrier();
-            OneToOneCommTime.add(
-                FoxMultiplyer.runMultiply(a, b, expected, new OneToOneComm())
-            );
-
-            MPI.COMM_WORLD.Barrier();
-            ManyCommunicatorTime.add(
-                FoxMultiplyer.runMultiply(a, b, expected, new ManyCommunicator())
-            );
+    private static int[] flatten2D(int[][] matrix) {
+        if (matrix == null) {
+            return new int[0];
         }
+        
+        int rows = matrix.length;
+        int cols = matrix[0].length;
+
+        int[] flat = new int[rows * cols];
+        for (int i = 0; i < rows; i++) {
+            System.arraycopy(matrix[i], 0, flat, i * cols, cols);
+        }
+        return flat;
     }
-
-    static void outputTestResults(
-        int sideSize, 
-        int count, 
-        boolean enableLog
-    ) {
-        if (MPI.COMM_WORLD.Rank() == 0) {
-            if (enableLog) {
-                System.out.println("OneToManyCommTime Avg: " 
-                    + OneToManyCommTime.stream().mapToDouble(Double::doubleValue).average().orElse(0.0));
-                System.out.println("OneToOneCommTime Avg: " 
-                    + OneToOneCommTime.stream().mapToDouble(Double::doubleValue).average().orElse(0.0));
-                System.out.println("ManyToManyCommTime Avg: " 
-                    + ManyToManyCommTime.stream().mapToDouble(Double::doubleValue).average().orElse(0.0));
-                System.out.println("ManyToOneCommTime Avg: " 
-                    + ManyToOneCommTime.stream().mapToDouble(Double::doubleValue).average().orElse(0.0));
-                System.out.println("ManyCommunicatorTime Avg: " 
-                    + ManyCommunicatorTime.stream().mapToDouble(Double::doubleValue).average().orElse(0.0));
-            }
-        }
-    }
-
-    static void run(
-        int sideSize, 
-        int count, 
-        int seed, 
-        boolean enableLog
-    ) {
-        Matrix a = null;
-        Matrix b = null;
-        Matrix expected = null;
-
-        if (MPI.COMM_WORLD.Rank() == 0) {
-            a = Matrix.genRandomMatrix(
-                sideSize, sideSize, seed);
-            b = Matrix.genRandomMatrix(
-                sideSize, sideSize, seed + 1);
-
-            if (enableLog) {
-                System.out.println("Matrix sideSize: " + sideSize);
-            }
-            
-            SingleTime.clear();
-            for (int index = 0; index < count; index++) {
-                double start = System.currentTimeMillis() / 1000.0;
-                expected = Matrix.multiply(a,b);
-                double singleProcessTime = System.currentTimeMillis() / 1000.0 - start;
-
-                SingleTime.add(singleProcessTime);
-            }
-
-            if (enableLog) {
-                double averageSingleTime = SingleTime.stream()
-                    .mapToDouble(Double::doubleValue)
-                    .average()
-                    .orElse(0.0);
-
-                System.out.printf(
-                    "Single process average time: %-5.3f sec %n", 
-                    averageSingleTime
-                );
-            }
-        }
-        test(count, a, b, expected);
-        outputTestResults(sideSize, count, enableLog);
-    } 
 }
