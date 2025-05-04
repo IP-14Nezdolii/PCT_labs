@@ -1,4 +1,4 @@
-package com.example.test;
+package com.example.utils;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.Function;
 
-import com.example.test.Tester.TestResult;
+import com.example.utils.Tester.TestResult;
 
 public class TestScenario<T> {
     private final List<TestResult> results = new ArrayList<>();

@@ -119,7 +119,6 @@ public class ParallelShellSortTest {
             assertEquals(
                 "Список з дублікатами повинен бути відсортований", expected, list
             );
-            
         }
     }
 

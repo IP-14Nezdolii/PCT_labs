@@ -1,12 +1,12 @@
 package com.example;
 
-import com.example.test.Test;
+import com.example.utils.Test;
 
 public class App 
 {
     public static void main( String[] args )
     {
-        Test.run(0, 10);
+        Test.run(0, 5);
     }
 
 }
