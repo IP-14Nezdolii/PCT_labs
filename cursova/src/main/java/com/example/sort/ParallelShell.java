@@ -42,7 +42,7 @@ public class ParallelShell {
         }
 
         public void sort(int maxThreads, int minSublistLen) {
-            try (TaskService service = new TaskService(maxThreads, maxThreads/2)) {
+            try (TaskService service = new TaskService(maxThreads, maxThreads)) {
                 for (h = knuthGap(); h > 0; h /= 3) {
 
                     if (list.size() / h >= minSublistLen) {

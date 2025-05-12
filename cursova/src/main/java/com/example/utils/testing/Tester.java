@@ -1,4 +1,4 @@
-package com.example.utils;
+package com.example.utils.testing;
 
 import java.util.Comparator;
 import java.util.List;
@@ -22,43 +22,20 @@ public class Tester {
         int threadNumb, 
         int sublistParam
     ) {
-        var timer = new Timer();
-        timer.start();
+        double start = System.nanoTime();
         ParallelShell.sort(list, cmp, threadNumb, sublistParam);
-        timer.end();
+        double end = System.nanoTime();
 
-        if (!expected.equals(list)) 
+        if (!expected.equals(list)) {
             throw new IllegalStateException("List is not sorted");
+        }
 
         return new TestResult(
             list.size(), 
-            timer.resultMicroTime(), 
+            (start - end)/1_000_000, 
             threadNumb, 
             sublistParam,
             list.get(0).getClass().getName()
         );
-    }
-}
-
-class Timer {
-    private double start = 0;
-    private long end = 0;
-
-    public double start() {
-        this.start = System.nanoTime();
-        return this.start;
-    }
-
-    public double end() {
-        this.end = System.nanoTime();
-        return this.end;
-    }
-
-    public double resultNanoTime() {
-        return end - start;
-    }
-
-    public double resultMicroTime() {
-        return (end - start)/1000.0;
     }
 }
