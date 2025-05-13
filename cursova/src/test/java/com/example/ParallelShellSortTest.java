@@ -12,6 +12,7 @@ import java.util.Random;
 import org.junit.Test;
 
 import com.example.sort.ParallelShell;
+import com.example.sort.Shell;
 
 public class ParallelShellSortTest {
     private final long seed = 10;
@@ -30,7 +31,6 @@ public class ParallelShellSortTest {
             assertEquals(
                 "Відсортований список повинен залишитися незмінним", expected, list
             );
-            
         }
     }
 
@@ -47,7 +47,6 @@ public class ParallelShellSortTest {
             assertEquals(
                 "Зворотно відсортований список повинен бути перевернутий", expected, list
             );
-            
         }
     }
 
@@ -63,7 +62,6 @@ public class ParallelShellSortTest {
             assertTrue(
                 "Порожній список повинен залишитися порожнім", list.isEmpty()
             );
-            
         }
     }
 
@@ -80,7 +78,6 @@ public class ParallelShellSortTest {
             assertEquals(
                 "Список з одним елементом повинен залишитися незмінним", expected, list
             );
-            
         }
     }
 
@@ -125,7 +122,7 @@ public class ParallelShellSortTest {
     @Test
     public void testLargeRandomList() {
 
-        int size = 10000;
+        int size = 100_000;
         int bound = 10000;
 
         Random random = new Random(seed);
@@ -135,7 +132,8 @@ public class ParallelShellSortTest {
         for (int i = 0; i < size; i++) {
             old.add(random.nextInt(bound));
         }
-        List<Integer> expected = old.stream().sorted(cmp).toList();
+        List<Integer> expected = new ArrayList<>(old);
+        Shell.sort(expected, cmp);
 
         for (int threadNumb = 2; threadNumb <= maxThreads; threadNumb++) {
             List<Integer> list = new ArrayList<>(old);
@@ -162,13 +160,11 @@ public class ParallelShellSortTest {
                     list.add(random.nextInt(100));
 
                 ArrayList<Integer> old = new ArrayList<>(list);
-                List<Integer> expected = list.stream().sorted(cmp).toList()
-;
+                List<Integer> expected = list.stream().sorted(cmp).toList();
                 ParallelShell.sort(list, cmp, 4);
 
                 assertEquals(old.toString(), expected, list);
             }
-            
         }
     }
 }
