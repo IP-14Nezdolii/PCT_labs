@@ -6,7 +6,7 @@ public class App
 {
     public static void main( String[] args )
     {
-        Test.runThreads(10);
+        Test.runSingle(1);
     }
 
 }

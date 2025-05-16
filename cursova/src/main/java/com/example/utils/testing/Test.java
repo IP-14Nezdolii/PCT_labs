@@ -17,15 +17,27 @@ public class Test {
         return genDoubleList(size, 1_000_000);
     };
 
-    public static void runThashold(int retestNumb) {
-        var threcholdScenario = TestScenario.makeScenario(
+    public static void runThrashold(int retestNumb) {
+        var thrasholdScenario = TestScenario.makeScenario(
             listGenerator, Comparator.naturalOrder(), retestNumb
         )
             .addLengthParams(10_000, 10_000_000, 0, 10)
             .addThreadNumbParams(1, 8, 0, 8)
             .addSublistParamParams(100, 100, 1, 1);
 
-        threcholdScenario.start();
+        thrasholdScenario.start();
+    }
+
+    public static void runSingle(int retestNumb) {
+        var mainScenario = TestScenario.makeScenario(
+            listGenerator, Comparator.naturalOrder(), retestNumb
+        )
+            .addLengthParams(10_000, 10_000_000, 0, 10)
+            .addThreadNumbParams(1, 1, 1, 1)
+            .addSublistParamParams(1, 1, 1, 1);
+
+        mainScenario.start();
+        outputer.output(mainScenario);
     }
 
     public static void runThreads(int retestNumb) {

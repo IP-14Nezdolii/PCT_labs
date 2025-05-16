@@ -32,7 +32,7 @@ public class Tester {
 
         return new TestResult(
             list.size(), 
-            (start - end)/1_000_000, 
+            (end - start)/1_000_000, 
             threadNumb, 
             sublistParam,
             list.get(0).getClass().getName()

@@ -120,7 +120,7 @@ public class TestScenario<T> {
 
                 results.add(new TestResult(
                     expected.size(), 
-                    (start - end)/1_000_000, 
+                    (end - start)/1_000_000, 
                     1, 
                     0,
                     expected.get(0).getClass().getName()

@@ -103,8 +103,8 @@ public class ShellSortTest {
     @Test
     public void testLargeRandomList() {
         Random random = new Random(seed);
-        List<Integer> list = new ArrayList<>();
-        int size = 10000;
+        int size = 1_000_000;
+        List<Integer> list = new ArrayList<>(size);
         
         for (int i = 0; i < size; i++) {
             list.add(random.nextInt(10000));
@@ -126,11 +126,11 @@ public class ShellSortTest {
         Comparator<Integer> cmp = Integer::compare;
 
         for (int i = 0; i < 10000; i++) {
+            ArrayList<Integer> list = new ArrayList<>(i);
 
-            ArrayList<Integer> list = new ArrayList<>(random.nextInt(300) + 1);
-
-            for (int j = 0; j < list.size(); j++) 
-                list.add(random.nextInt(100));
+            for (int j = 0; j < i; j++) {
+                list.add(random.nextInt(1000));
+            }     
 
             List<Integer> expected = list.stream().sorted(cmp).toList();
             Shell.sort(list, cmp);

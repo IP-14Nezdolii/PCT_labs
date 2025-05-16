@@ -16,6 +16,10 @@ public class TaskService implements AutoCloseable {
     }
 
     public void addAndExecute(Runnable task) {
+        // if (semaphore.tryAcquire()) {
+
+        // }
+
         try {
             semaphore.acquire();
             executorService.execute(() -> {
