@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import com.example.sort.Shell;
+import com.example.utils.testing.Test.SortMethod;
 import com.example.utils.testing.Tester.TestResult;
 
 import lombok.Getter;
@@ -26,22 +27,27 @@ public class TestScenario<T> {
     private final Comparator<T> cmp;
     private final int retestNumb;
 
+    private final SortMethod<T> sorter;
+
     private TestScenario(
         Function<Integer, List<T>> listGenerator, 
         Comparator<T> cmp,
-        int retestNumb
+        int retestNumb,
+        SortMethod<T> sorter
     ) {
         this.listGenerator = listGenerator;
         this.cmp = cmp;
         this.retestNumb = retestNumb;
+        this.sorter = sorter;
     }
 
     public static <T> TestScenario<T> makeScenario(
         Function<Integer, List<T>> listGenerator, 
         Comparator<T> cmp,
-        int retestNumb
+        int retestNumb,
+        SortMethod<T> sorter
     ) {
-        return new TestScenario<T>(listGenerator, cmp, retestNumb);
+        return new TestScenario<T>(listGenerator, cmp, retestNumb, sorter);
     }
 
     public TestScenario<T> addLengthParams(int from, int to, int sum, int mul) {
@@ -91,7 +97,8 @@ public class TestScenario<T> {
                                     expectedLists.get(listSize), 
                                     cmp,
                                     threadNum, 
-                                    sublistParam
+                                    sublistParam,
+                                    sorter
                                 ));
 
                                 sublistParam *= sublistParamParam.mul;

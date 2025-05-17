@@ -7,6 +7,8 @@ import java.util.Random;
 import java.util.function.Function;
 
 import com.example.utils.testing.output.TerminalOutputer;
+import com.example.sort.ParallelShell;
+import com.example.sort.QueueingShell;
 import com.example.utils.testing.output.ScenarioResultsOutputer;
 
 public class Test {
@@ -17,9 +19,24 @@ public class Test {
         return genDoubleList(size, 1_000_000);
     };
 
-    public static void runThrashold(int retestNumb) {
+    public static void runThrasholdP(int retestNumb) {
+        SortMethod<Double> m = ParallelShell::sort;
+
         var thrasholdScenario = TestScenario.makeScenario(
-            listGenerator, Comparator.naturalOrder(), retestNumb
+            listGenerator, Comparator.naturalOrder(), retestNumb, m
+        )
+            .addLengthParams(10_000, 10_000_000, 0, 10)
+            .addThreadNumbParams(1, 8, 0, 8)
+            .addSublistParamParams(100, 100, 1, 1);
+
+        thrasholdScenario.start();
+    }
+
+    public static void runThrasholdQ(int retestNumb) {
+        SortMethod<Double> m = QueueingShell::sort;
+
+        var thrasholdScenario = TestScenario.makeScenario(
+            listGenerator, Comparator.naturalOrder(), retestNumb, m
         )
             .addLengthParams(10_000, 10_000_000, 0, 10)
             .addThreadNumbParams(1, 8, 0, 8)
@@ -29,8 +46,10 @@ public class Test {
     }
 
     public static void runSingle(int retestNumb) {
+        SortMethod<Double> m = ParallelShell::sort;
+
         var mainScenario = TestScenario.makeScenario(
-            listGenerator, Comparator.naturalOrder(), retestNumb
+            listGenerator, Comparator.naturalOrder(), retestNumb, m
         )
             .addLengthParams(10_000, 10_000_000, 0, 10)
             .addThreadNumbParams(1, 1, 1, 1)
@@ -40,11 +59,13 @@ public class Test {
         outputer.output(mainScenario);
     }
 
-    public static void runThreads(int retestNumb) {
+    public static void runThreadsP(int retestNumb) {
+        SortMethod<Double> m = ParallelShell::sort;
+
         var mainScenario = TestScenario.makeScenario(
-            listGenerator, Comparator.naturalOrder(), retestNumb
+            listGenerator, Comparator.naturalOrder(), retestNumb, m
         )
-            .addLengthParams(1_000, 10_000, 0, 10)
+            .addLengthParams(100_000, 10_000_000, 0, 10)
             .addThreadNumbParams(2, 8, 0, 4)
             .addSublistParamParams(1092, 1092, 1, 1);
 
@@ -52,9 +73,39 @@ public class Test {
         outputer.output(mainScenario);
     }
 
-    public static void runSublistParam(int retestNumb) {
+    public static void runThreadsQ(int retestNumb) {
+        SortMethod<Double> m = QueueingShell::sort;
+
+        var mainScenario = TestScenario.makeScenario(
+            listGenerator, Comparator.naturalOrder(), retestNumb, m
+        )
+            .addLengthParams(100_000, 10_000_000, 0, 10)
+            .addThreadNumbParams(2, 8, 0, 4)
+            .addSublistParamParams(1092, 1092, 1, 1);
+
+        mainScenario.start();
+        outputer.output(mainScenario);
+    }
+
+    public static void runSublistParamP(int retestNumb) {
+        SortMethod<Double> m = ParallelShell::sort;
+
         var sublistParamScenario = TestScenario.makeScenario(
-            listGenerator, Comparator.naturalOrder(), retestNumb
+            listGenerator, Comparator.naturalOrder(), retestNumb, m
+        )
+            .addLengthParams(2_000_000, 20_000_000, 0, 10)
+            .addThreadNumbParams(8, 8, 1, 1)
+            .addSublistParamParams(5, 1000, 0, 2);
+
+        sublistParamScenario.start();
+        outputer.output(sublistParamScenario);
+    }
+
+    public static void runSublistParamQ(int retestNumb) {
+        SortMethod<Double> m = QueueingShell::sort;
+
+        var sublistParamScenario = TestScenario.makeScenario(
+            listGenerator, Comparator.naturalOrder(), retestNumb, m
         )
             .addLengthParams(2_000_000, 20_000_000, 0, 10)
             .addThreadNumbParams(8, 8, 1, 1)
@@ -75,6 +126,11 @@ public class Test {
     public static void setSeed(int seed) {
         SEED = seed;
     }
+
+    @FunctionalInterface
+    public interface SortMethod<T> {
+        void sort(List<T> list, Comparator<T> cmp, int maxThreads, int minSublistLen);
+    } 
 }
 
 

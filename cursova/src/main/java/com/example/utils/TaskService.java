@@ -9,26 +9,22 @@ public class TaskService implements AutoCloseable {
     private final Semaphore semaphore;
     private final int waitingN;
 
-    public TaskService(int maxThreads, int waitingQueueSize) {
-        this.waitingN = waitingQueueSize + maxThreads;
+    public TaskService(int maxThreads) {
+        maxThreads -= 1;
+        this.waitingN = maxThreads * 2;
         this.executorService = Executors.newFixedThreadPool(maxThreads);
         this.semaphore = new Semaphore(waitingN);
     }
 
     public void addAndExecute(Runnable task) {
-        // if (semaphore.tryAcquire()) {
-
-        // }
-
-        try {
-            semaphore.acquire();
+        if (semaphore.tryAcquire()) {
             executorService.execute(() -> {
                 task.run();
                 semaphore.release();
             });
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            Thread.currentThread().interrupt();
+        }
+        else {
+            task.run();
         }
     }
 

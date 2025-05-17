@@ -6,7 +6,8 @@ public class App
 {
     public static void main( String[] args )
     {
-        Test.runSingle(1);
+        // Test.runThrashold(5);
+        Test.runThreadsQ(5);
     }
 
 }

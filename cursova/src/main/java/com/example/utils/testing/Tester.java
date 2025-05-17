@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.example.sort.ParallelShell;
+import com.example.utils.testing.Test.SortMethod;
 
 public class Tester {
     
@@ -20,10 +21,11 @@ public class Tester {
         List<T> expected,
         Comparator<T> cmp, 
         int threadNumb, 
-        int sublistParam
+        int sublistParam,
+        SortMethod<T> sorter
     ) {
         double start = System.nanoTime();
-        ParallelShell.sort(list, cmp, threadNumb, sublistParam);
+        sorter.sort(list, cmp, threadNumb, sublistParam);
         double end = System.nanoTime();
 
         if (!expected.equals(list)) {

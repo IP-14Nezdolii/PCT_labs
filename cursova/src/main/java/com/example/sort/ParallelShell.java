@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.example.utils.TaskService;
 
-public class ParallelShell {
+public class ParallelShell{
 
     public static <T> void sort(
         List<T> list, 
@@ -42,7 +42,7 @@ public class ParallelShell {
         }
 
         public void sort(int maxThreads, int minSublistLen) {
-            try (TaskService service = new TaskService(maxThreads, maxThreads)) {
+            try (TaskService service = new TaskService(maxThreads)) {
                 for (h = knuthGap(); h > 0; h /= 3) {
 
                     if (list.size() / h >= minSublistLen) {
