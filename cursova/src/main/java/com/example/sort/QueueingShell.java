@@ -4,6 +4,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.Semaphore;
 
 public class QueueingShell {
@@ -57,7 +59,7 @@ public class QueueingShell {
                         }
                     }
                 }
-            } catch (InterruptedException e) {
+            } catch (InterruptedException | BrokenBarrierException e) {
                 e.printStackTrace();
                 Thread.currentThread().interrupt();
             }
@@ -84,19 +86,19 @@ public class QueueingShell {
         }
 
         private class QueueingService implements AutoCloseable {
-            private final int END = -1;
+            private final int END = -2;
+            private final int NEW_ITER = -1;
+
             private final BlockingQueue<Integer> queue;
             private final Thread[] threads;
 
-            private final Semaphore semaphore;
-            private final int waitingN;
+            private final CyclicBarrier barrier;
 
             public QueueingService(int maxThreads) {
                 maxThreads = maxThreads - 1;
-                int queueLen = maxThreads * 3;
+                int queueLen = maxThreads * 2;
 
-                this.waitingN = maxThreads + queueLen;
-                this.semaphore = new Semaphore(waitingN);
+                this.barrier = new CyclicBarrier(maxThreads + 1);
 
                 queue = new ArrayBlockingQueue<>(queueLen);
                 threads = new Thread[maxThreads];
@@ -108,9 +110,7 @@ public class QueueingShell {
             }
 
             public void execute(int g) throws InterruptedException {
-                if (queue.offer(g)) {
-                    semaphore.acquire();
-                } else {
+                if (!queue.offer(g)) {
                     gapInsertionSort(g);
                 }
             }
@@ -122,34 +122,39 @@ public class QueueingShell {
 
                         while (true) {
                             g = queue.take();
-                            if (g == END)
-                                break;
-
+                            if (g < 0) {
+                                if (g == NEW_ITER) {
+                                    barrier.await();
+                                    continue;
+                                } else {
+                                    break;
+                                }
+                            }
                             gapInsertionSort(g);
-                            semaphore.release();
                         }
-                    } catch (InterruptedException e) {
+                    } catch (InterruptedException | BrokenBarrierException e) {
                         e.printStackTrace();
                         Thread.currentThread().interrupt();
                     }
                 };
             }
 
-            public void waitTasks() throws InterruptedException {
+            public void waitTasks() throws InterruptedException, BrokenBarrierException {
                 Integer elem = queue.poll();
                 while (elem != null) {  
                     gapInsertionSort(elem);
-
-                    semaphore.release();
                     elem = queue.poll();
                 }
 
-                semaphore.acquire(waitingN);
-                semaphore.release(waitingN);
+                for (int i = 0; i < threads.length; i++) {
+                    queue.add(NEW_ITER);
+                }
+
+                barrier.await();
             }
 
             @Override
-            public void close() throws InterruptedException {
+            public void close() throws InterruptedException, BrokenBarrierException {
                 waitTasks();
 
                 for (int i = 0; i < threads.length; i++) {

@@ -3,7 +3,6 @@ package com.example.utils.testing;
 import java.util.Comparator;
 import java.util.List;
 
-import com.example.sort.ParallelShell;
 import com.example.utils.testing.Test.SortMethod;
 
 public class Tester {

@@ -12,7 +12,6 @@ import java.util.Random;
 import org.junit.Test;
 
 import com.example.sort.QueueingShell;
-import com.example.sort.Shell;
 
 public class QueueingShellTest {
     private final long seed = 10;
@@ -130,8 +129,7 @@ public class QueueingShellTest {
         for (int i = 0; i < size; i++) {
             old.add(random.nextInt(10000));
         }
-        List<Integer> expected = new ArrayList<>(old);
-        Shell.sort(expected, cmp);
+        List<Integer> expected = old.stream().sorted(cmp).toList();
 
         for (int threadNumb = 2; threadNumb <= maxThreads; threadNumb++) {
             List<Integer> list = new ArrayList<>(old);
