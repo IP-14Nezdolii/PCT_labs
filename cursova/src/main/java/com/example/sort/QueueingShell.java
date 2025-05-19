@@ -2,11 +2,11 @@ package com.example.sort;
 
 import java.util.Comparator;
 import java.util.List;
+
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.Semaphore;
 
 public class QueueingShell {
 
@@ -16,7 +16,7 @@ public class QueueingShell {
         int maxThreads
     ) {
         if (maxThreads > 1) {
-            (new Sorter<>(list, cmp)).sort(maxThreads, 80);
+            (new Sorter<>(list, cmp)).sort(maxThreads, 20);
         } else {
             Shell.sort(list, cmp);
         }  
@@ -96,12 +96,10 @@ public class QueueingShell {
 
             public QueueingService(int maxThreads) {
                 maxThreads = maxThreads - 1;
-                int queueLen = maxThreads * 2;
 
                 this.barrier = new CyclicBarrier(maxThreads + 1);
-
-                queue = new ArrayBlockingQueue<>(queueLen);
-                threads = new Thread[maxThreads];
+                this.queue = new ArrayBlockingQueue<>(maxThreads + 1);
+                this.threads = new Thread[maxThreads];
 
                 for (int i = 0; i < threads.length; i++) {
                     threads[i] = new Thread(createConsumer());
@@ -154,9 +152,7 @@ public class QueueingShell {
             }
 
             @Override
-            public void close() throws InterruptedException, BrokenBarrierException {
-                waitTasks();
-
+            public void close() throws InterruptedException {
                 for (int i = 0; i < threads.length; i++) {
                     queue.add(END);
                 }

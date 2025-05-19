@@ -65,9 +65,9 @@ public class Test {
         var mainScenario = TestScenario.makeScenario(
             listGenerator, Comparator.naturalOrder(), retestNumb, m
         )
-            .addLengthParams(100_000, 10_000_000, 0, 10)
+            .addLengthParams(20_000, 20_000_000, 0, 10)
             .addThreadNumbParams(2, 8, 0, 4)
-            .addSublistParamParams(1092, 1092, 1, 1);
+            .addSublistParamParams(40, 40, 1, 1);
 
         mainScenario.start();
         outputer.output(mainScenario);
@@ -79,9 +79,9 @@ public class Test {
         var mainScenario = TestScenario.makeScenario(
             listGenerator, Comparator.naturalOrder(), retestNumb, m
         )
-            .addLengthParams(100_000, 10_000_000, 0, 10)
+            .addLengthParams(20_000, 20_000_000, 0, 10)
             .addThreadNumbParams(2, 8, 0, 4)
-            .addSublistParamParams(1092, 1092, 1, 1);
+            .addSublistParamParams(20, 20, 1, 1);
 
         mainScenario.start();
         outputer.output(mainScenario);

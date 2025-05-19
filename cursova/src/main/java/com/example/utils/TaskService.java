@@ -11,7 +11,7 @@ public class TaskService implements AutoCloseable {
 
     public TaskService(int maxThreads) {
         maxThreads -= 1;
-        this.waitingN = maxThreads * 2;
+        this.waitingN = maxThreads * 2 + 1;
         this.executorService = Executors.newFixedThreadPool(maxThreads);
         this.semaphore = new Semaphore(waitingN);
     }

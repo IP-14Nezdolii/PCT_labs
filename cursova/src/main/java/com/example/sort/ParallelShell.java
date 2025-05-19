@@ -13,7 +13,7 @@ public class ParallelShell{
         int maxThreads
     ) {
         if (maxThreads > 1) {
-            (new Sorter<>(list, cmp)).sort(maxThreads, 80);
+            (new Sorter<>(list, cmp)).sort(maxThreads, 40);
         } else {
             Shell.sort(list, cmp);
         }  
