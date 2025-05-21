@@ -16,7 +16,6 @@ public class Server {
 
     public void start() {
         try (ServerSocket serverSocket = new ServerSocket(5000)) {
-            System.out.println("Server started at 5000");
             handleClient(serverSocket.accept());
             
         } catch (IOException e) {
@@ -29,7 +28,6 @@ public class Server {
             ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
         ) {
-            
             while (true) {
                 String request = (String)ois.readObject();
 
@@ -48,7 +46,7 @@ public class Server {
                     oos.writeObject("OK");
                     oos.flush();
 
-                }else {
+                } else {
                     oos.writeObject("UNKNOWN REQUEST");
                     oos.flush();
                 }

@@ -9,29 +9,53 @@ import com.example.utils.Matrix;
 
 public class Client {
     private int count = 10;
-
     private Matrix matrixA, matrixB;
+    private final boolean enableLogging;
 
-    public void start() {
+    public Client(boolean enableLogging) {
+        this.enableLogging = enableLogging;
+    }
+
+    public void startV1() {
         try (
             Socket socket = new Socket("localhost", 5000); 
             ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
         ) {
-            System.out.println("Connected to server on port 5000");
+            if (enableLogging) {
+                System.out.println("Connected to server on port 5000");
+            }
 
-            double startTime = 0;
-
-            startTime = System.currentTimeMillis();
+            double startTime = System.currentTimeMillis();
             for (int i = 0; i < count; i++) {
                 oos.writeObject("MUL");
                 oos.flush();
 
                 ois.readObject();
             }
-            System.out.println((System.currentTimeMillis() - startTime) / count);
 
-            startTime = System.currentTimeMillis();
+            if (enableLogging) {
+                System.out.println((System.currentTimeMillis() - startTime) / count);
+            }
+
+            oos.writeObject("END");
+        } catch (IOException | ClassNotFoundException e) {
+             e.printStackTrace();
+             Thread.currentThread().interrupt();
+        }
+    }
+
+    public void startV2() {
+        try (
+            Socket socket = new Socket("localhost", 5000); 
+            ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+            ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+        ) {
+            if (enableLogging) {
+                System.out.println("Connected to server on port 5000");
+            }
+
+            double startTime = System.currentTimeMillis();
             for (int i = 0; i < count; i++) {
                 oos.writeObject("SEND");
                 oos.writeObject(matrixA);
@@ -40,7 +64,10 @@ public class Client {
 
                 ois.readObject();
             }
-            System.out.println((System.currentTimeMillis() - startTime) / count);
+
+            if (enableLogging) {
+                System.out.println((System.currentTimeMillis() - startTime) / count);
+            }
 
             oos.writeObject("END");
         } catch (IOException | ClassNotFoundException e) {
