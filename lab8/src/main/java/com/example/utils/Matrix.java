@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class Matrix extends MatrixBlock {
-    private final double[][] data;
+    private double[][] data;
 
     public Matrix(int rows, int cols, double val) {
         super(rows, cols);
@@ -41,10 +41,6 @@ public class Matrix extends MatrixBlock {
         return Arrays.stream(data).mapToDouble(doubles -> doubles[index]).toArray();
     }
 
-    public double[][] getData() {
-        return data;
-    }
-
     public static Matrix genRandomMatrix(int rows, int cols, long seed) {
         Random random = new Random(seed);
 
@@ -74,44 +70,6 @@ public class Matrix extends MatrixBlock {
     }
     public MatrixView getView(int iPos, int jPos, int rows, int cols) {
         return new MatrixView(iPos, jPos, rows, cols, this);
-    }
-
-    public static Matrix[] getBlocks(Matrix matrix, int n) {
-        int q = (int) Math.sqrt(n);
-
-        int iStep = matrix.rows() / q;
-        int jStep = matrix.cols() / q;
-
-        Matrix[] blocks = new Matrix[q * q];
-
-        for (int i = 0; i < q; i++) {
-            for (int j = 0; j < q; j++) {
-                blocks[i * q + j] = matrix.getView(i*iStep, j*jStep, iStep, jStep).getCopyMatrix();
-            }
-        }
-
-        return blocks;
-    }
-
-    public static Matrix blocksToMatrix(Matrix[] blocks) {
-        int q = (int) Math.sqrt(blocks.length);
-
-        Matrix result = new Matrix(blocks[0].rows() * q, blocks[0].cols() * q);
-
-        for (int k = 0; k < blocks.length; k++) {
-            Matrix block = blocks[k];
-
-            int iPos = (k / q) * block.rows();
-            int jPos = (k % q) * block.cols();
-
-            for (int i = 0; i < block.rows(); i++) {
-                for (int j = 0; j < block.cols(); j++) {
-                    result.set(i + iPos, j + jPos, block.get(i, j));
-                }
-            }
-        }
-
-        return result;
     }
 
     public class MatrixView extends MatrixBlock {
@@ -155,16 +113,20 @@ public class Matrix extends MatrixBlock {
             return this.getCopyMatrix(rows(), cols());
         }
 
-        public Matrix getCopyMatrix(int copyRows, int copyCols) {
-            Matrix result = new Matrix(copyRows, copyCols);
+        public Matrix getCopyMatrix(int rows, int cols) {
+            Matrix result = new Matrix(rows, cols);
 
-            copyRows = Math.min(result.rows(), rows());
-            copyCols = Math.min(result.cols(), cols());
+            cols = Math.min(result.cols(), cols());
+            rows = Math.min(result.rows(), rows());
 
-            for (int i = iPos, j = 0; i < copyRows + iPos; i++, j++) {
-                // double[] src = matrix.data[i];
-                // double[] dst = result.data[j];
-                System.arraycopy(matrix.data[i], jPos, result.data[j], 0, copyCols);
+            for (int i = iPos, j = 0; i < rows; i++, j++) {
+                System.arraycopy(
+                    matrix.data[i], 
+                    0, 
+                    result.data[j], 
+                    0, 
+                    cols
+                );
             }
 
             return result;

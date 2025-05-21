@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.example</groupId>
-  <artifactId>lab7</artifactId>
+  <artifactId>lab8</artifactId>
   <version>1.0-SNAPSHOT</version>
 
   <name>lab6</name>
@@ -24,14 +24,6 @@
       <artifactId>junit</artifactId>
       <version>4.11</version>
       <scope>test</scope>
-    </dependency>
-
-    <dependency>
-        <groupId>mpj</groupId>
-        <artifactId>mpj</artifactId>
-        <version>0.44</version>
-        <scope>system</scope>
-        <systemPath>C:\\Programs\\mpj\\mpj-v0_44\\lib\\mpj.jar</systemPath>
     </dependency>
   </dependencies>
 

@@ -3,8 +3,8 @@ package com.example.utils;
 import java.io.Serializable;
 
 public abstract class MatrixBlock implements Serializable {
-    protected final int rows;
-    protected final int cols;
+    private final int rows;
+    private final int cols;
 
     MatrixBlock(int rows, int cols) {
         this.rows = rows;
