@@ -22,8 +22,7 @@ public class TaskService implements AutoCloseable {
                 task.run();
                 semaphore.release();
             });
-        }
-        else {
+        } else {
             task.run();
         }
     }
