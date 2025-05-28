@@ -59,9 +59,6 @@ public class QueueingShell {
                         }
                     }
                 }
-            } catch (InterruptedException | BrokenBarrierException e) {
-                e.printStackTrace();
-                Thread.currentThread().interrupt();
             }
         }
 
@@ -86,15 +83,18 @@ public class QueueingShell {
         }
 
         private class QueueingService implements AutoCloseable {
-            private final int END = -2;
             private final int NEW_ITER = -1;
+            private final int END = -2;
 
             private final BlockingQueue<Integer> queue;
+            private final CyclicBarrier barrier;
             private final Thread[] threads;
 
-            private final CyclicBarrier barrier;
-
             public QueueingService(int maxThreads) {
+                if (maxThreads < 2) {
+                    throw new IllegalArgumentException("Number of threads must be at least 2");
+                }
+
                 maxThreads = maxThreads - 1;
 
                 this.barrier = new CyclicBarrier(maxThreads + 1);
@@ -107,7 +107,7 @@ public class QueueingShell {
                 }
             }
 
-            public void execute(int g) throws InterruptedException {
+            public void execute(int g) {
                 if (!queue.offer(g)) {
                     gapInsertionSort(g);
                 }
@@ -137,27 +137,39 @@ public class QueueingShell {
                 };
             }
 
-            public void waitTasks() throws InterruptedException, BrokenBarrierException {
-                Integer elem = queue.poll();
-                while (elem != null) {  
-                    gapInsertionSort(elem);
-                    elem = queue.poll();
-                }
+            public void waitTasks() {
+                try {              
+                    Integer elem = queue.poll();
+                    while (elem != null) {  
+                        gapInsertionSort(elem);
+                        elem = queue.poll();
+                    }
 
-                for (int i = 0; i < threads.length; i++) {
-                    queue.add(NEW_ITER);
-                }
+                    for (int i = 0; i < threads.length; i++) {
+                        queue.add(NEW_ITER);
+                    }
 
-                barrier.await();
+                    barrier.await();
+
+                } catch (InterruptedException | BrokenBarrierException e) {
+                    e.printStackTrace();
+                    Thread.currentThread().interrupt();
+                }
             }
 
             @Override
-            public void close() throws InterruptedException {
-                for (int i = 0; i < threads.length; i++) {
-                    queue.add(END);
-                }
-                for (Thread t : threads) {
-                    t.join();
+            public void close() {
+                try {
+                    for (int i = 0; i < threads.length; i++) {
+                        queue.add(END);
+                    }
+                    for (Thread t : threads) {
+                        t.join();
+                    }
+                    
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    Thread.currentThread().interrupt();
                 }
             }
         }
