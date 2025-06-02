@@ -51,7 +51,7 @@ public class TaskService implements AutoCloseable {
                 }
             }
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            System.err.println("waitTasks interrupted: " + e.getMessage());
             Thread.currentThread().interrupt();
         }
     }

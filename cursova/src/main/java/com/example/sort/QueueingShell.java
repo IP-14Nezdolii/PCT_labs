@@ -169,7 +169,10 @@ public class QueueingShell {
                     
                 } catch (InterruptedException e) {
                     e.printStackTrace();
-                    Thread.currentThread().interrupt();
+                    for (Thread t : threads) {
+                        t.interrupt();
+                    }
+                    
                 }
             }
         }
