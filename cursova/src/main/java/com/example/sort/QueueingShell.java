@@ -172,7 +172,7 @@ public class QueueingShell {
                     for (Thread t : threads) {
                         t.interrupt();
                     }
-                    
+                    Thread.currentThread().interrupt();
                 }
             }
         }
